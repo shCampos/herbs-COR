@@ -1,0 +1,10 @@
+{
+	"filotaxia": ["Alternas", "Opostas", "Verticiladas", "Rosuladas", "Germinadas", "Fasciculadas"],
+	"limbo": ["Acicular", "Cordiforme", "Deltóide", "Etílica", "Ensiforme", "Escamiforme", "Espatulada", "Falciforme", "Hastada ou alarbadina", "Lanceolada", "Linear", "Oblonga", "Obovada", "Orbicular", "Ovada", "Peltada", "Reniforme", "Sagitada", "Subulada"],
+	"apice": ["Acuminado", "Agudo", "Cuspidado", "Emarginado", "Mucronado", "Obtuso", "Retuso", "Truncado"],
+	"base": ["Acunheada ou cuneiforme", "Atenuada", "Auriculada", "Cordada", "Hastada", "Oblíqua", "Obtusa", "Reniforme", "Sagitada", "Truncada"],
+	"margem": ["Aculeado", "Crenado", "Dentado", "Inteiro", "Ondulado", "Serrado", "Serrilhado", "Sinuoso", "Lobado", "Fendido", "Partido", "Secto ou cortado"],
+	"venacao": ["Uninérveas", "Paralelinérveas", "Peninérveas", "Palminérveas", "Curvinérvias", "Peltinérveas"],
+	"superficie": ["Glabra", "Pilosa", "Lisa", "Rugosa"],
+	"consistencia": ["Carnosa", "Coriacia", "Herbácea", "Membranácea"]
+}
