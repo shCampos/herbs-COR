@@ -70,20 +70,18 @@ export default function App() {
               <form item autoComplete="off" style={{width: '100%'}}>
                 <Grid container spacing={4}>
                   <Grid item xs={6}>
-                    <Autocomplete
+                    <Autocomplete                      
                       id="familly"
                       options={["balba", "blabla"]}
                       getOptionLabel={(option) => option}
-                      style={{ width: 300 }}
                       renderInput={(params) => <TextField {...params} label="Família" variant="outlined" />}
                     />
                   </Grid>
-                  <Grid>
+                  <Grid item xs={6}>
                     <Autocomplete
                       id="genus"
                       options={["balba", "blabla"]}
                       getOptionLabel={(option) => option}
-                      style={{ width: 300 }}
                       renderInput={(params) => <TextField {...params} label="Gênero" variant="outlined" />}
                     />
                   </Grid>
@@ -137,8 +135,28 @@ export default function App() {
             <Typography className={classes.heading}>Adicionar uma espécie</Typography>
           </AccordionSummary>
           <AccordionDetails>
-            <form item autoComplete="off">            
-              <TextField fullWidth id="newSpecieName" className={classes.input} label="Nome da espécie" variant="outlined"/>
+            <form autoComplete="off" style={{width: '100%'}}>
+              <Grid container spacing={4}>
+                <Grid item xs={6}>
+                  <Autocomplete
+                    className={classes.input}
+                    id="familly"
+                    options={["balba", "blabla"]}
+                    getOptionLabel={(option) => option}
+                    renderInput={(params) => <TextField {...params} label="Família" variant="outlined" />}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <Autocomplete
+                    className={classes.input}
+                    id="genus"
+                    options={["balba", "blabla"]}
+                    getOptionLabel={(option) => option}
+                    renderInput={(params) => <TextField {...params} label="Gênero" variant="outlined" />}
+                  />
+                </Grid>
+              </Grid>
+              <TextField fullWidth id="newSpecieName" className={classes.input} label="Nome da espécie com autor" variant="outlined"/>
               <TextField fullWidth multiline rows={10} id="newSpecieDescription" className={classes.input} label="Descrição" variant="outlined"/>
               <Button variant="contained" color="primary">
                 Enviar
