@@ -28,21 +28,28 @@ export default function App() {
       flexGrow: 1,
       width: width,
       minHeight: height,
-      backgroundColor: '#fefefe',
-      color: '#2e2b2b'
+      backgroundColor: '#363636',
+      color: '#ebebeb'
     },
     siteDescription: {
-      backgroundColor: '#199900',
+      backgroundColor: '#0e5201',
       color: 'white',
       paddingLeft: '5px',
       paddingRight: '5px',
-      marginBottom: '15px'
+      marginBottom: '15px',
+      textTransform: 'lowercase'
     },
     acordionHeader: {
-      backgroundColor: '#f5f5f5'
+      backgroundColor: '#242424',
+      color: '#ebebeb'
+    },
+    acordionBody: {
+      backgroundColor: '#4d4d4d',
+      color: '#ebebeb'
     },
     input: {
       marginBottom: '10px',
+      color: '#ebebeb',
       width: '100%'
     },
     heading: {
@@ -52,7 +59,12 @@ export default function App() {
     btn: {
       backgroundColor: '#199900',
       color: 'white',
-      fontWeight: 'bold'
+      fontWeight: 'bold',
+      '&:hover': {
+        backgroundColor: '#0069d9',
+        borderColor: '#0062cc',
+        boxShadow: 'none',
+      },
     }
   }))
 
@@ -114,7 +126,7 @@ export default function App() {
               Pesquisar uma espécie
             </Typography>
           </AccordionSummary>
-          <AccordionDetails fullWidth>
+          <AccordionDetails fullWidth className={classes.acordionBody}>
             {!flagAlert.searched?(
               <form item autoComplete="off" style={{width: '100%'}} onSubmit={handleFormSubmit(searchSpecie)}>
                 <Grid container spacing={4}>
@@ -227,7 +239,7 @@ export default function App() {
               Adicionar uma espécie
             </Typography>
           </AccordionSummary>
-          <AccordionDetails>
+          <AccordionDetails className={classes.acordionBody}>
             <form onSubmit={handleFormSubmit(newDescription)} autoComplete="off" style={{width: '100%'}}>
               <Grid container fullWidth style={{marginBottom: '10px'}}>
                 {(flagAlert.sucessSendDescription)&&(
