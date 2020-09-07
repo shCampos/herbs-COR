@@ -280,7 +280,7 @@ export default function App() {
             ):(
               <Alert severity="info" style={{width: '100%'}}>
                 <AlertTitle>Info</AlertTitle>
-                This is an info alert — <strong>check it out!</strong>
+                Em construção
               </Alert>
             )}
           </AccordionDetails>
@@ -353,7 +353,12 @@ export default function App() {
                 label="Descrição"
                 variant="outlined"
               />
-              <Button type="submit" variant="contained" className={classes.btn} color="primary">
+              <Button
+                type="submit"
+                variant="contained"
+                className={classes.btn}
+                color="primary"                
+              >
                 Enviar
               </Button>
             </form>
