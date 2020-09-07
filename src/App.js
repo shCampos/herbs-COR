@@ -32,6 +32,18 @@ const themeObject = {
     secondary: {
       main: '#4D216B',
     },
+    error: {
+      main: '#B82114'
+    },
+    warning: {
+      main: '#B85014'
+    },
+    info: {
+      main: '#3975B8'
+    },
+    success: {
+      main: '#369E21'
+    },
     type: 'light'
   },
   typography: {
@@ -67,15 +79,26 @@ export default function App() {
       flexGrow: 1,
       width: width,
       minHeight: height-48,
+      paddingLeft: '10px',
+      paddingRight: '10px',
       backgroundColor: theme.palette.background
+    },
+    siteTitle: {
+      color: theme.palette.text
     },
     siteDescription: {
       backgroundColor: '#3eb827',
-      color: theme.palette.text,
-      paddingLeft: '5px',
-      paddingRight: '5px',
+      color: '#fff',
+      paddingLeft: '2px',
+      paddingRight: '2px',
       marginBottom: '15px',
-      textTransform: 'lowercase'
+      textTransform: 'lowercase',
+      fontSize: '20pt',
+      textAlign: 'center'
+    },
+    acordionHeader: {
+      backgroundColor: theme.palette.text.secondary,
+      color: '#fff'
     },
     input: {
       marginBottom: '10px',
@@ -140,8 +163,8 @@ export default function App() {
         <Brightness7/>
       </IconButton>
     </Grid>
-    <Grid container direction="column" justify="center" alignItems="center"className={classes.root}>
-      <Typography variant="h2">
+    <Grid container direction="column" justify="center" alignItems="center" className={classes.root}>
+      <Typography variant="h2" className={classes.siteTitle}>
         Lineus
       </Typography>
       <Typography variant="h6" className={classes.siteDescription}>
