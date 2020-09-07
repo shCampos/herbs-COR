@@ -38,6 +38,9 @@ export default function App() {
       paddingRight: '5px',
       marginBottom: '15px'
     },
+    acordionHeader: {
+      backgroundColor: '#f5f5f5'
+    },
     input: {
       marginBottom: '10px',
       width: '100%'
@@ -55,12 +58,15 @@ export default function App() {
 
   const classes = useStyles()
   const [expanded, setExpanded] = useState(false)
-  const [searched, setSearched] = useState(false)
   const [familly, setFamilly] = useState('')
   const [genus, setGenus] = useState('')
   const [searchParams, setSearchParams] = useState({ })
   const [specieDescription, setSpecieDescription] = useState({ })
-
+  const [flagAlert, setFlagAlert] = useState({
+    sucessSendDescription:false,
+    errorSendDescription: false,
+    searched: false,
+  })
   const handlePanelChange = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false)
   }
@@ -79,17 +85,17 @@ export default function App() {
     callback()
   }
   const searchSpecie = () => {
-    //setSearched(true)
-    console.log(searchParams)
+    setFlagAlert({searched: true})
   }
   const newDescription = () => {
     postDescription({
       familly: familly,
       genus: genus,
-      scientificName: specieDescription,
+      scientificName: specieDescription.scientificName,
       description: specieDescription.description
     })
-    console.log(specieDescription)
+    .then((res)=>setFlagAlert({sucessSendDescription: true})) 
+    .catch((err)=>setFlagAlert({errorSendDescription: true}))
   }
 
   return (
@@ -103,13 +109,13 @@ export default function App() {
 
       <div>
         <Accordion expanded={expanded === 'panel1'} onChange={handlePanelChange('panel1')}>
-          <AccordionSummary expandIcon={<ExpandMore />} aria-controls="panel1a-content" id="panel1a-header">
+          <AccordionSummary expandIcon={<ExpandMore />} aria-controls="panel1a-content" id="panel1a-header" className={classes.acordionHeader}>
             <Typography className={classes.heading} variant="overline">
               Pesquisar uma espécie
             </Typography>
           </AccordionSummary>
           <AccordionDetails fullWidth>
-            {!searched?(
+            {!flagAlert.searched?(
               <form item autoComplete="off" style={{width: '100%'}} onSubmit={handleFormSubmit(searchSpecie)}>
                 <Grid container spacing={4}>
                   <Grid item xs={6}>
@@ -216,13 +222,21 @@ export default function App() {
 
         <Accordion expanded={expanded === 'panel2'} onChange={handlePanelChange('panel2')}>
           <AccordionSummary
-          expandIcon={<ExpandMore />} aria-controls="panel1a-content" id="panel1a-header">
+          expandIcon={<ExpandMore />} aria-controls="panel1a-content" id="panel1a-header" className={classes.acordionHeader}>
             <Typography className={classes.heading} variant="overline">
               Adicionar uma espécie
             </Typography>
           </AccordionSummary>
           <AccordionDetails>
             <form onSubmit={handleFormSubmit(newDescription)} autoComplete="off" style={{width: '100%'}}>
+              <Grid container fullWidth style={{marginBottom: '10px'}}>
+                {(flagAlert.sucessSendDescription)&&(
+                  <Alert style={{width: '100%'}} severity="success">Descrição enviada ao banco de dados!</Alert>
+                )}
+                {(flagAlert.errorSendDescription)&&(
+                  <Alert style={{width: '100%'}} severity="error">Erro em enviar descrição ao banco de dados.</Alert>
+                )}
+              </Grid>
               <Grid container spacing={4}>
                 <Grid item xs={6}>
                   <Autocomplete
