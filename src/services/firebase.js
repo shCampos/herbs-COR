@@ -1,8 +1,6 @@
 const firebase = require('firebase/app')
-
 require('firebase/database')
 
-// Your web app's Firebase configuration
 const firebaseConfig = {
 	apiKey: "AIzaSyDULUALMQA7hXa7pfgArN9u0QFd6tPEN_s",
 	authDomain: "especies-pantanal.firebaseapp.com",
@@ -12,8 +10,6 @@ const firebaseConfig = {
 	messagingSenderId: "201819029776",
 	appId: "1:201819029776:web:ab0ffe3c0a2b33bb92e595"
 }
-
-// Initialize Firebase
 firebase.initializeApp(firebaseConfig)
 
 export async function postDescription(data) {

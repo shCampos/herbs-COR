@@ -1,73 +1,95 @@
 import React, { useState } from 'react'
-import { makeStyles } from '@material-ui/core/styles'
+import { makeStyles, createMuiTheme } from '@material-ui/core/styles'
 import { 
   Accordion,
   AccordionSummary,
   AccordionDetails,
   Button,
+  CssBaseline,
   FormControl,
   Grid,
+  IconButton,
   InputLabel,
   InputAdornment,
   MenuItem,
+  ThemeProvider,
   OutlinedInput,
   Select,
   TextField,
   Typography } from '@material-ui/core'
 
 import { Alert, AlertTitle, Autocomplete } from '@material-ui/lab'
-import { ExpandMore } from '@material-ui/icons'
+import { ExpandMore, Brightness7 } from '@material-ui/icons'
 
 import useWindowDimensions from './utils/useWindowDimensions'
 import { postDescription } from './services/firebase.js'
 
+const themeObject = {
+  palette: {
+    primary: {
+      main: '#3eb827',
+    },
+    secondary: {
+      main: '#4D216B',
+    },
+    type: 'light'
+  },
+  typography: {
+    fontFamily: 'Roboto'
+  }
+};
+
+const useDarkMode = () => {
+  const [theme, setTheme] = useState(themeObject)
+  const { 
+    palette: { type }
+  } = theme
+  const toogleDarkMode = () => {
+    const updatedTheme = {
+      ...theme,
+      palette: {
+        ...theme.palette,
+        type: type === 'light'?'dark':'light'
+      }
+    }
+    setTheme(updatedTheme)
+  }
+  return [theme, toogleDarkMode]
+}
+
 export default function App() {
+  const [theme, toogleDarkMode] = useDarkMode()
+  const themeConfig = createMuiTheme(theme)
+
   const { height, width } = useWindowDimensions()
   const useStyles = makeStyles((theme) => ({
     root: {
       flexGrow: 1,
       width: width,
-      minHeight: height,
-      backgroundColor: '#363636',
-      color: '#ebebeb'
+      minHeight: height-48,
+      backgroundColor: theme.palette.background
     },
     siteDescription: {
-      backgroundColor: '#0e5201',
-      color: 'white',
+      backgroundColor: '#3eb827',
+      color: theme.palette.text,
       paddingLeft: '5px',
       paddingRight: '5px',
       marginBottom: '15px',
       textTransform: 'lowercase'
     },
-    acordionHeader: {
-      backgroundColor: '#242424',
-      color: '#ebebeb'
-    },
-    acordionBody: {
-      backgroundColor: '#4d4d4d',
-      color: '#ebebeb'
-    },
     input: {
       marginBottom: '10px',
-      color: '#ebebeb',
-      width: '100%'
+      width: '100%',
     },
     heading: {
       fontSize: theme.typography.pxToRem(15),
       fontWeight: theme.typography.fontWeightRegular,
     },
     btn: {
-      backgroundColor: '#199900',
-      color: 'white',
       fontWeight: 'bold',
-      '&:hover': {
-        backgroundColor: '#0069d9',
-        borderColor: '#0062cc',
-        boxShadow: 'none',
-      },
+      color: '#fff',  
     }
   }))
-
   const classes = useStyles()
   const [expanded, setExpanded] = useState(false)
   const [familly, setFamilly] = useState('')
@@ -111,7 +133,14 @@ export default function App() {
   }
 
   return (
-    <Grid container direction="column" justify="center" alignItems="center" className={classes.root}>
+    <ThemeProvider theme={themeConfig}>
+    <CssBaseline/>
+    <Grid container direction="column">
+      <IconButton variant="contained" onClick={toogleDarkMode} style={{width: 'min-content', height: 'min-content'}}>
+        <Brightness7/>
+      </IconButton>
+    </Grid>
+    <Grid container direction="column" justify="center" alignItems="center"className={classes.root}>
       <Typography variant="h2">
         Lineus
       </Typography>
@@ -219,7 +248,7 @@ export default function App() {
                   variant="outlined"
                 />
 
-                <Button type="submit" variant="contained" className={classes.btn}>
+                <Button type="submit" variant="contained" className={classes.btn} color="primary">
                   Pesquisar
                 </Button>
               </form>
@@ -299,7 +328,7 @@ export default function App() {
                 label="Descrição"
                 variant="outlined"
               />
-              <Button type="submit" variant="contained" className={classes.btn}>
+              <Button type="submit" variant="contained" className={classes.btn} color="primary">
                 Enviar
               </Button>
             </form>
@@ -307,5 +336,6 @@ export default function App() {
         </Accordion>
       </div>
     </Grid>
+    </ThemeProvider>
   );
 }
