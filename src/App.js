@@ -19,7 +19,7 @@ import {
   Typography } from '@material-ui/core'
 
 import { Alert, AlertTitle, Autocomplete } from '@material-ui/lab'
-import { ExpandMore, Brightness7 } from '@material-ui/icons'
+import { Brightness7, ExpandMore, GitHub} from '@material-ui/icons'
 
 import useWindowDimensions from './utils/useWindowDimensions'
 import { postDescription } from './services/firebase.js'
@@ -93,7 +93,6 @@ export default function App() {
       paddingRight: '2px',
       marginBottom: '15px',
       textTransform: 'lowercase',
-      fontSize: '20pt',
       textAlign: 'center'
     },
     acordionHeader: {
@@ -151,16 +150,19 @@ export default function App() {
       scientificName: specieDescription.scientificName,
       description: specieDescription.description
     })
-    .then((res)=>setFlagAlert({sucessSendDescription: true})) 
+    .then(()=>setFlagAlert({sucessSendDescription: true})) 
     .catch((err)=>setFlagAlert({errorSendDescription: true}))
   }
 
   return (
     <ThemeProvider theme={themeConfig}>
     <CssBaseline/>
-    <Grid container direction="column">
+    <Grid container direction="row" justify="flex-start">
       <IconButton variant="contained" onClick={toogleDarkMode} style={{width: 'min-content', height: 'min-content'}}>
         <Brightness7/>
+      </IconButton>
+      <IconButton variant="contained" href="https://github.com/shCampos/lineus" target="_blank" style={{width: 'min-content', height: 'min-content'}}>
+        <GitHub/>
       </IconButton>
     </Grid>
     <Grid container direction="column" justify="center" alignItems="center" className={classes.root}>
