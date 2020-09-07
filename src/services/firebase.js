@@ -13,6 +13,5 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig)
 
 export async function postDescription(data) {
-	console.log(firebaseConfig)
 	await firebase.database().ref('descriptions/').push(data)
 }

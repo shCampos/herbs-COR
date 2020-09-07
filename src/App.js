@@ -259,7 +259,7 @@ export default function App() {
                   variant="outlined"
                 />
 
-                <Typography variant="overline">Flor e inflorescência (se tiver)</Typography>
+                <Typography variant="overline">Inflorescência (se tiver) e flor</Typography>
                 <TextField
                   required
                   id="flowerDescription"
@@ -312,7 +312,7 @@ export default function App() {
                     onChange={(event, newValue) => {
                       setFamilly(newValue);
                     }}
-                    options={["balba", "blabla"]}
+                    options={['Banco de dados vazio...']}
                     getOptionLabel={(option) => option}
                     renderInput={(params) => <TextField {...params} label="Família" variant="outlined" />}
                   />
@@ -325,7 +325,7 @@ export default function App() {
                     onChange={(event, newValue) => {
                       setGenus(newValue)
                     }}               
-                    options={["balba", "blabla"]}
+                    options={['Banco de dados vazio...']}
                     getOptionLabel={(option) => option}
                     renderInput={(params) => <TextField {...params} label="Gênero" variant="outlined" />}
                   />
