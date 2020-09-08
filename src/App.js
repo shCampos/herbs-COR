@@ -66,6 +66,7 @@ const useDarkMode = () => {
         type: type === 'light'?'dark':'light'
       }
     }
+    localStorage.setItem('@lineus/theme', updatedTheme.palette.type)
     setTheme(updatedTheme)
   }
   return [theme, toogleDarkMode]
@@ -76,7 +77,10 @@ const filter = createFilterOptions()
 export default function App() {
   const [theme, toogleDarkMode] = useDarkMode()
   const themeConfig = createMuiTheme(theme)
-
+  useEffect(() => {
+    const userTheme = localStorage.getItem('@lineus/theme')
+    userTheme==='dark'&&toogleDarkMode()
+  }, [])
   const { height, width } = useWindowDimensions()
   const useStyles = makeStyles((theme) => ({
     root: {
