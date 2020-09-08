@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { makeStyles, createMuiTheme } from '@material-ui/core/styles'
 import { 
   Accordion,
@@ -18,11 +18,13 @@ import {
   TextField,
   Typography } from '@material-ui/core'
 
-import { Alert, AlertTitle, Autocomplete } from '@material-ui/lab'
+
+import { Alert, AlertTitle } from '@material-ui/lab'
+import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete'
 import { Brightness7, ExpandMore, GitHub} from '@material-ui/icons'
 
 import useWindowDimensions from './utils/useWindowDimensions'
-import { postDescription } from './services/firebase.js'
+import { postDescription, getAllFamilies, postNewFamily } from './services/firebase.js'
 
 const themeObject = {
   palette: {
@@ -69,6 +71,8 @@ const useDarkMode = () => {
   return [theme, toogleDarkMode]
 }
 
+const filter = createFilterOptions()
+
 export default function App() {
   const [theme, toogleDarkMode] = useDarkMode()
   const themeConfig = createMuiTheme(theme)
@@ -113,8 +117,27 @@ export default function App() {
     }
   }))
   const classes = useStyles()
-  const [expanded, setExpanded] = useState(false)
-  const [familly, setFamilly] = useState('')
+  const [expanded, setExpanded] = useState(false)  
+  const [families, setFamilies] = useState([])
+  useEffect(() => {
+    getAllFamilies((databaseFromFirebase) => {
+      const familiesList = []
+      Object.entries(databaseFromFirebase).map((fam) => {
+        familiesList.push(fam[1])
+      })
+      const withFirstLetterFamiliesList = familiesList.map((fam) => {
+        const firstLetter = fam.name[0].toUpperCase()
+        return {
+          firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
+          ...fam,
+        }
+      })
+      const sortedFamiliesList = withFirstLetterFamiliesList.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))
+      setFamilies(sortedFamiliesList)
+    })
+  }, [])
+
+  const [family, setFamily] = useState('')
   const [genus, setGenus] = useState('')
   const [searchParams, setSearchParams] = useState({ })
   const [specieDescription, setSpecieDescription] = useState({ })
@@ -123,6 +146,7 @@ export default function App() {
     errorSendDescription: false,
     searched: false,
   })
+
   const handlePanelChange = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false)
   }
@@ -145,7 +169,7 @@ export default function App() {
   }
   const newDescription = () => {
     postDescription({
-      familly: familly,
+      family: family,
       genus: genus,
       scientificName: specieDescription.scientificName,
       description: specieDescription.description
@@ -187,12 +211,13 @@ export default function App() {
                   <Grid item xs={6}>
                     <Autocomplete
                       required
-                      id="familly"
-                      value={familly}
+                      id="family"
+                      value={family}
                       onChange={(event, newValue) => {
-                        setFamilly(newValue);
+                        setFamily(newValue);
                       }}
-                      options={["balba", "blabla"]}
+                      options={families}
+                      getOptionLabel={(option) => option.name}
                       renderInput={(params) => <TextField {...params} label="Família" variant="outlined" />}
                     />
                   </Grid>
@@ -307,13 +332,32 @@ export default function App() {
                 <Grid item xs={6}>
                   <Autocomplete
                     className={classes.input}
-                    id="familly"
-                    value={familly}
+                    id="family"
+                    value={family}
                     onChange={(event, newValue) => {
-                      setFamilly(newValue);
+                      setFamily(newValue)
+                      if(!families.includes(newValue)){
+                        setFamilies([...families, newValue])
+                        postNewFamily({
+                          name: newValue
+                        })
+                      }
                     }}
-                    options={['Banco de dados vazio...']}
-                    getOptionLabel={(option) => option}
+                    filterOptions={(options, params) => {
+                      const filtered = filter(options, params)
+                      params.inputValue!==''&&filtered.push(params.inputValue)
+                      return filtered;
+                    }}
+                    options={families}
+                    getOptionLabel={(option) => {
+                      if (typeof option === 'string') {
+                        return option
+                      }
+                      if (option.inputValue) {
+                        return option.inputValue
+                      }
+                      return option.name
+                    }}
                     renderInput={(params) => <TextField {...params} label="Família" variant="outlined" />}
                   />
                 </Grid>

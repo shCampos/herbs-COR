@@ -15,3 +15,14 @@ firebase.initializeApp(firebaseConfig)
 export async function postDescription(data) {
 	await firebase.database().ref('descriptions/').push(data)
 }
+
+export async function getAllFamilies(setFamilies) {
+	await firebase.database().ref('families/')
+	.on('value', (dataSnapshot) => {
+    setFamilies(dataSnapshot.val())
+  })
+}
+
+export async function postNewFamily(family) {
+	await firebase.database().ref('families/').push(family)
+}
