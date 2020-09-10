@@ -26,3 +26,15 @@ export async function getAllFamilies(setFamilies) {
 export async function postNewFamily(family) {
 	await firebase.database().ref('families/').push(family)
 }
+
+export async function postNewGenusByFamilyName(family, newGenus) {
+	await firebase.database().ref('families/')
+	.orderByChild('name')
+	.equalTo(family)
+	.on('value', async (dataSnapshot) => {
+		const familyKey = Object.keys(dataSnapshot.val())[0]
+		console.log('familyKey', familyKey, newGenus)
+		await firebase.database().ref('families/'+familyKey)
+		.set({name: family, genus: newGenus})
+	})
+}

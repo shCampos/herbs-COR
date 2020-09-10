@@ -18,13 +18,16 @@ import {
   TextField,
   Typography } from '@material-ui/core'
 
-
 import { Alert, AlertTitle } from '@material-ui/lab'
 import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete'
 import { Brightness7, ExpandMore, GitHub} from '@material-ui/icons'
 
 import useWindowDimensions from './utils/useWindowDimensions'
-import { postDescription, getAllFamilies, postNewFamily } from './services/firebase.js'
+import { 
+  postDescription,
+  getAllFamilies,
+  postNewFamily,
+  postNewGenusByFamilyName } from './services/firebase.js'
 
 const themeObject = {
   palette: {
@@ -121,26 +124,27 @@ export default function App() {
     }
   }))
   const classes = useStyles()
-  const [expanded, setExpanded] = useState(false)  
+  const [expanded, setExpanded] = useState(false)
   const [families, setFamilies] = useState([])
+  const [genres, setGenres] = useState([])
   useEffect(() => {
     getAllFamilies((databaseFromFirebase) => {
-      const familiesList = []
-      Object.entries(databaseFromFirebase).map((fam) => {
-        familiesList.push(fam[1])
-      })
-      const withFirstLetterFamiliesList = familiesList.map((fam) => {
-        const firstLetter = fam.name[0].toUpperCase()
-        return {
-          firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
-          ...fam,
-        }
-      })
-      const sortedFamiliesList = withFirstLetterFamiliesList.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))
-      setFamilies(sortedFamiliesList)
+      if(typeof databaseFromFirebase === 'undefined' || databaseFromFirebase === null) {
+        setFamilies([])
+      } else {
+        console.log('ENTROU NO IF', databaseFromFirebase)
+        const familiesList = Object.entries(databaseFromFirebase).map((fam) => typeof fam[1].name !== 'undefined'&&fam[1])
+        const withFirstLetterFamiliesList = familiesList.map((fam) => {
+          return {
+            ...fam,
+            firstLetter: fam.name[0].toUpperCase()
+          }
+        })
+        const sortedFamiliesList = withFirstLetterFamiliesList.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))
+        setFamilies(sortedFamiliesList)
+      }           
     })
   }, [])
-
   const [family, setFamily] = useState('')
   const [genus, setGenus] = useState('')
   const [searchParams, setSearchParams] = useState({ })
@@ -219,6 +223,7 @@ export default function App() {
                       value={family}
                       onChange={(event, newValue) => {
                         setFamily(newValue);
+                        typeof newValue.genus === 'undefined'?setGenres([]):setGenres(newValue.genus)
                       }}
                       options={families}
                       getOptionLabel={(option) => option.name}
@@ -233,7 +238,7 @@ export default function App() {
                       onChange={(event, newValue) => {
                         setGenus(newValue)
                       }}
-                      options={["balba", "blabla"]}
+                      options={genres}
                       getOptionLabel={(option) => option}
                       renderInput={(params) => <TextField {...params} label="Gênero" variant="outlined" />}
                     />
@@ -339,9 +344,10 @@ export default function App() {
                     id="family"
                     value={family}
                     onChange={(event, newValue) => {
-                      setFamily(newValue)
+                      typeof newValue.name == 'undefined'||newValue.name == null?setFamily({name: newValue}):setFamily(newValue)
+                      typeof newValue.genus == 'undefined'?setGenres([]):setGenres(newValue.genus)
                       if(!families.includes(newValue)){
-                        setFamilies([...families, newValue])
+                        (genres[0]=='Banco de dados vazio')?setFamilies([newValue]):setFamilies([...families, newValue])
                         postNewFamily({
                           name: newValue
                         })
@@ -370,10 +376,29 @@ export default function App() {
                     className={classes.input}
                     id="genus" 
                     value={genus}
+                    disabled={family?false:true}
                     onChange={(event, newValue) => {
                       setGenus(newValue)
-                    }}               
-                    options={['Banco de dados vazio...']}
+                      if(!genres.includes(newValue)){
+                        setGenres([...genres, newValue])
+                        postNewGenusByFamilyName(family.name, [...genres, newValue])
+                      }
+                    }}
+                    filterOptions={(options, params) => {                      
+                      const filtered = filter(options, params)
+                      params.inputValue!==''&&filtered.push(params.inputValue)
+                      return filtered
+                    }}
+                    options={genres}
+                    getOptionLabel={(option) => {
+                      if(typeof option === 'string') {
+                        return option
+                      }
+                      if (option.inputValue) {
+                        return option.inputValue
+                      }
+                      return option
+                    }}
                     getOptionLabel={(option) => option}
                     renderInput={(params) => <TextField {...params} label="Gênero" variant="outlined" />}
                   />
