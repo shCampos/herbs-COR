@@ -19,7 +19,7 @@ Apenas um site para ajudar na identificação de plantas.
 - Pull requests são muito bem-vindos também :).
 
 ## Equipe
-|![](https://avatars3.githubusercontent.com/u/26483698?s=400&u=afaa39a1a298d02925ba07dd4c6558d4c676d8e1&v=4 =80x)  |
+|<img src="https://avatars3.githubusercontent.com/u/26483698?s=400&u=afaa39a1a298d02925ba07dd4c6558d4c676d8e1&v=4" width="80px"/> |
 |--|
 |[Samuel H. Campos](https://github.com/shCampos)|
 |UFMS - CPAN|
