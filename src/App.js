@@ -228,7 +228,6 @@ export default function App() {
                         if(typeof newValue === 'undefined'||newValue === null){
                           setGenres([])
                         } else {
-                          console.log('TA NO IF')
                           typeof newValue.genus == 'undefined'||newValue.genus == null?setGenres([]):setGenres(newValue.genus)
                         }
                       }}
