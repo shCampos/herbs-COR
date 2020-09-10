@@ -222,8 +222,15 @@ export default function App() {
                       id="family"
                       value={family}
                       onChange={(event, newValue) => {
-                        setFamily(newValue);
-                        typeof newValue.genus === 'undefined'?setGenres([]):setGenres(newValue.genus)
+                        console.log('newValue', newValue)
+                        setFamily(newValue)
+                        setGenus('')
+                        if(typeof newValue === 'undefined'||newValue === null){
+                          setGenres([])
+                        } else {
+                          console.log('TA NO IF')
+                          typeof newValue.genus == 'undefined'||newValue.genus == null?setGenres([]):setGenres(newValue.genus)
+                        }
                       }}
                       options={families}
                       getOptionLabel={(option) => option.name}
@@ -344,8 +351,10 @@ export default function App() {
                     id="family"
                     value={family}
                     onChange={(event, newValue) => {
+                      console.log(newValue)
                       typeof newValue.name == 'undefined'||newValue.name == null?setFamily({name: newValue}):setFamily(newValue)
-                      typeof newValue.genus == 'undefined'?setGenres([]):setGenres(newValue.genus)
+                      typeof newValue.genus == 'undefined'||newValue.genus == null?setGenres([]):setGenres(newValue.genus)
+                      setGenus('')
                       if(!families.includes(newValue)){
                         (genres[0]=='Banco de dados vazio')?setFamilies([newValue]):setFamilies([...families, newValue])
                         postNewFamily({
