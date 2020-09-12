@@ -179,7 +179,7 @@ export default function App() {
     postDescription(family.name, genus.name, specieDescription)
     .then(() => {
       setFlagAlert({sucessSendDescription: true})
-      setSpecieDescription(null)
+      setSpecieDescription({})
     }) 
     .catch((err) => {
       console.log(err)
@@ -228,7 +228,12 @@ export default function App() {
                         if(typeof newValue === 'undefined'||newValue === null){
                           setGenres([])
                         } else {
-                          typeof newValue.genus == 'undefined'||newValue.genus == null?setGenres([]):setGenres(newValue.genus)
+                          if(typeof newValue.genus == 'undefined'||newValue.genus == null) {
+                            setGenres([])
+                          } else {
+                            const auxGenres = Object.entries(newValue.genus).map((gen) => gen[1])
+                            setGenres(auxGenres)
+                          }
                         }
                       }}
                       options={families}
@@ -355,10 +360,8 @@ export default function App() {
                         setGenres([])
                       } else {
                         const auxGenres = Object.entries(newValue.genus).map((gen) => gen[1])
-                        console.log(auxGenres)
                         setGenres(auxGenres)
                       }
-                      console.log('saafoisduif', genres)
                       setGenus('')
                       if(!families.includes(newValue)){
                         (genres[0]=='Banco de dados vazio')?setFamilies([newValue]):setFamilies([...families, newValue])
