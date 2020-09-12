@@ -27,7 +27,7 @@ import {
   postDescription,
   getAllFamilies,
   postNewFamily,
-  postNewGenusByFamilyName } from './services/firebase.js'
+  postNewGenusByFamilyName } from './utils/firebase.js'
 
 const themeObject = {
   palette: {
@@ -128,11 +128,12 @@ export default function App() {
   const [families, setFamilies] = useState([])
   const [genres, setGenres] = useState([])
   useEffect(() => {
+    specieDescription!=null&&setFlagAlert({sucessSendDescription: false})
+
     getAllFamilies((databaseFromFirebase) => {
       if(typeof databaseFromFirebase === 'undefined' || databaseFromFirebase === null) {
         setFamilies([])
       } else {
-        console.log('ENTROU NO IF', databaseFromFirebase)
         const familiesList = Object.entries(databaseFromFirebase).map((fam) => typeof fam[1].name !== 'undefined'&&fam[1])
         const withFirstLetterFamiliesList = familiesList.map((fam) => {
           return {
@@ -154,7 +155,6 @@ export default function App() {
     errorSendDescription: false,
     searched: false,
   })
-
   const handlePanelChange = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false)
   }
@@ -176,14 +176,14 @@ export default function App() {
     setFlagAlert({searched: true})
   }
   const newDescription = () => {
-    postDescription({
-      family: family,
-      genus: genus,
-      scientificName: specieDescription.scientificName,
-      description: specieDescription.description
-    })
-    .then(()=>setFlagAlert({sucessSendDescription: true})) 
-    .catch((err)=>setFlagAlert({errorSendDescription: true}))
+    postDescription(family.name, genus.name, specieDescription)
+    .then(() => {
+      setFlagAlert({sucessSendDescription: true})
+      setSpecieDescription(null)
+    }) 
+    .catch((err) => {
+      console.log(err)
+      setFlagAlert({errorSendDescription: true})})
   }
 
   return (
@@ -245,7 +245,7 @@ export default function App() {
                         setGenus(newValue)
                       }}
                       options={genres}
-                      getOptionLabel={(option) => option}
+                      getOptionLabel={(option) => option.name}
                       renderInput={(params) => <TextField {...params} label="Gênero" variant="outlined" />}
                     />
                   </Grid>
@@ -350,9 +350,15 @@ export default function App() {
                     id="family"
                     value={family}
                     onChange={(event, newValue) => {
-                      console.log(newValue)
                       typeof newValue.name == 'undefined'||newValue.name == null?setFamily({name: newValue}):setFamily(newValue)
-                      typeof newValue.genus == 'undefined'||newValue.genus == null?setGenres([]):setGenres(newValue.genus)
+                      if(typeof newValue.genus == 'undefined'||newValue.genus == null) {
+                        setGenres([])
+                      } else {
+                        const auxGenres = Object.entries(newValue.genus).map((gen) => gen[1])
+                        console.log(auxGenres)
+                        setGenres(auxGenres)
+                      }
+                      console.log('saafoisduif', genres)
                       setGenus('')
                       if(!families.includes(newValue)){
                         (genres[0]=='Banco de dados vazio')?setFamilies([newValue]):setFamilies([...families, newValue])
@@ -389,7 +395,7 @@ export default function App() {
                       setGenus(newValue)
                       if(!genres.includes(newValue)){
                         setGenres([...genres, newValue])
-                        postNewGenusByFamilyName(family.name, [...genres, newValue])
+                        postNewGenusByFamilyName(family.name, newValue)
                       }
                     }}
                     filterOptions={(options, params) => {                      
@@ -405,9 +411,9 @@ export default function App() {
                       if (option.inputValue) {
                         return option.inputValue
                       }
-                      return option
+                      return option.name
                     }}
-                    getOptionLabel={(option) => option}
+                    getOptionLabel={(option) => option.name}
                     renderInput={(params) => <TextField {...params} label="Gênero" variant="outlined" />}
                   />
                 </Grid>

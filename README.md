@@ -1,8 +1,8 @@
 <center>
-<h1>
-Lineus
-</h1>
-Apenas um site para ajudar na identificação de plantas.
+	<h1>
+		Lineus
+	</h1>
+	Apenas um site para ajudar na identificação de plantas.
 </center>
 
 
