@@ -46,5 +46,8 @@ export const styleObject = makeStyles((theme) => ({
   btn: {
     fontWeight: 'bold',
     color: '#fff',  
+  },
+  porcentagem: {
+    backgroundColor: '#3eb827'
   }
 }))

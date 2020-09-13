@@ -1,21 +1,27 @@
 import React, { useEffect, useState } from 'react'
 import { createMuiTheme } from '@material-ui/core/styles'
-import { 
+import {
+  Avatar,
   Accordion,
   AccordionSummary,
   AccordionDetails,
   Button,
   CssBaseline,
+  Divider,
   FormControl,
   Grid,
   IconButton,
   InputLabel,
   InputAdornment,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
   MenuItem,
-  ThemeProvider,
   OutlinedInput,
   Select,
   TextField,
+  ThemeProvider,
   Typography } from '@material-ui/core'
 import { Alert, AlertTitle } from '@material-ui/lab'
 import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete'
@@ -64,6 +70,16 @@ export default function App() {
   const classes = styleObject()
 
   const [expanded, setExpanded] = useState(false)
+  const handlePanelChange = (panel) => (event, isExpanded) => {
+    setExpanded(isExpanded ? panel : false)
+  }
+  const [flagAlert, setFlagAlert] = useState({
+    sucessSendDescription:false,
+    errorSendDescription: false,
+    missingParams: false,
+    searched: false,
+  })
+
   const [families, setFamilies] = useState([])
   const [genres, setGenres] = useState([])
   useEffect(() => {
@@ -83,18 +99,16 @@ export default function App() {
       }
     })
   }, [])
+
   const [family, setFamily] = useState('')
   const [genus, setGenus] = useState('')
   const [searchParams, setSearchParams] = useState({ })
   const [specieDescription, setSpecieDescription] = useState({ })
-  const [flagAlert, setFlagAlert] = useState({
-    sucessSendDescription:false,
-    errorSendDescription: false,
-    missingParams: false,
-    searched: false,
-  })
-  const handlePanelChange = (panel) => (event, isExpanded) => {
-    setExpanded(isExpanded ? panel : false)
+  const [probableSpecies, setProbableSpecies] = useState([{name: 'Nome especie', percentage: 50}, {name: 'Blabla bleble', percentage: 40}])
+
+  const handleFormSubmit = callback => event => {
+    event.preventDefault()
+    callback()
   }
   const handleFormSearchChange = (event) => {
     const auxSearchValues = { ...searchParams }
@@ -106,15 +120,15 @@ export default function App() {
     auxDescriptionValues[event.target.name] = event.target.value
     setSpecieDescription(auxDescriptionValues)
   }
-  const handleFormSubmit = callback => event => {
-    event.preventDefault()
-    callback()
+  const toogleShowForm = () => {
+    setFlagAlert({searched: false})
   }
+
   const searchSpecie = () => {
     compareDescriptions(searchParams)
     setFlagAlert({searched: true})
-
   }
+
   const newDescription = () => {
     postDescription(family.name, genus.name, specieDescription)
     .then(() => {
@@ -126,7 +140,7 @@ export default function App() {
       setFlagAlert({errorSendDescription: true})
       setTimeout(() => setFlagAlert({errorSendDescription: false}), 8000)
     })
-  }
+  }  
 
   return (
     <ThemeProvider theme={themeConfig}>
@@ -150,9 +164,17 @@ export default function App() {
       <div>
         <Accordion expanded={expanded === 'panel1'} onChange={handlePanelChange('panel1')}>
           <AccordionSummary expandIcon={<ExpandMore />} aria-controls="panel1a-content" id="panel1a-header" className={classes.acordionHeader}>
-            <Typography className={classes.heading} variant="overline">
-              Pesquisar uma espécie
-            </Typography>
+            {
+            !flagAlert.searched?(
+              <Typography className={classes.heading} variant="overline">
+                Pesquisar uma espécie
+              </Typography>
+            ):(
+              <Typography className={classes.heading} variant="overline">
+                Possíveis resultados
+              </Typography>
+            )
+            }
           </AccordionSummary>
           <AccordionDetails fullWidth className={classes.acordionBody}>
             {!flagAlert.searched?(
@@ -266,10 +288,30 @@ export default function App() {
                 </Button>
               </form>
             ):(
-              <Alert variant="outlined" severity="info" style={{width: '100%'}}>
-                <AlertTitle>Info</AlertTitle>
-                Em construção
-              </Alert>
+              <div>
+                <List style={{paddingTop: '0px'}}>
+                  {
+                    probableSpecies.map((specie) => {
+                      const specieName = specie.name.split(' ').slice(0,2).join(' ')
+                      const specieAuthor = specie.name.split(' ').slice(2).join(' ')
+                      return (
+                        <div style={{width: '100%'}}>
+                          <ListItem>
+                            <ListItemAvatar>
+                              <Avatar className={classes.porcentagem}>{specie.percentage}%</Avatar>
+                            </ListItemAvatar>
+                            <ListItemText
+                              primary={<span><font style={{fontStyle: 'italic'}}>{specieName}</font> {specieAuthor}</span>}
+                              secondary="LINKS EXTERNOS EM IMPLEMENTAÇÃO"/>
+                          </ListItem>      
+                          <Divider />
+                        </div>
+                      )                    
+                    })
+                  }                
+                </List>
+                <Button variant="contained" className={classes.btn} color="primary" onClick={toogleShowForm}>Continuar pesquisando</Button>
+              </div>
             )}
           </AccordionDetails>
         </Accordion>

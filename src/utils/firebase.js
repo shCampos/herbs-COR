@@ -60,6 +60,7 @@ export async function getAllSpecies() {
     	console.log(speciesList)
     }))
   })
+  return speciesList
 }
 
 export async function postNewFamily(family) {
