@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { makeStyles, createMuiTheme } from '@material-ui/core/styles'
+import { createMuiTheme } from '@material-ui/core/styles'
 import { 
   Accordion,
   AccordionSummary,
@@ -22,39 +22,14 @@ import { Alert, AlertTitle } from '@material-ui/lab'
 import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete'
 import { Brightness7, ExpandMore, GitHub} from '@material-ui/icons'
 
-import useWindowDimensions from './utils/useWindowDimensions'
 import { 
   postDescription,
   getAllFamilies,
   postNewFamily,
   postNewGenusByFamilyName } from './utils/firebase.js'
 
-const themeObject = {
-  palette: {
-    primary: {
-      main: '#3eb827',
-    },
-    secondary: {
-      main: '#4D216B',
-    },
-    error: {
-      main: '#B82114'
-    },
-    warning: {
-      main: '#B85014'
-    },
-    info: {
-      main: '#3975B8'
-    },
-    success: {
-      main: '#369E21'
-    },
-    type: 'light'
-  },
-  typography: {
-    fontFamily: 'Roboto'
-  }
-};
+import { themeObject } from './assets/themeObject.js'
+import { styleObject } from './assets/styleObject.js'
 
 const useDarkMode = () => {
   const [theme, setTheme] = useState(themeObject)
@@ -84,52 +59,12 @@ export default function App() {
     const userTheme = localStorage.getItem('@lineus/theme')
     userTheme==='dark'&&toogleDarkMode()
   }, [])
-  const { height, width } = useWindowDimensions()
-  const useStyles = makeStyles((theme) => ({
-    root: {
-      flexGrow: 1,
-      width: width,
-      minHeight: height-48,
-      paddingLeft: '10px',
-      paddingRight: '10px',
-      backgroundColor: theme.palette.background
-    },
-    siteTitle: {
-      color: theme.palette.text
-    },
-    siteDescription: {
-      backgroundColor: '#3eb827',
-      color: '#fff',
-      paddingLeft: '2px',
-      paddingRight: '2px',
-      marginBottom: '15px',
-      textTransform: 'lowercase',
-      textAlign: 'center'
-    },
-    acordionHeader: {
-      backgroundColor: theme.palette.text.secondary,
-      color: '#fff'
-    },
-    input: {
-      marginBottom: '10px',
-      width: '100%',
-    },
-    heading: {
-      fontSize: theme.typography.pxToRem(15),
-      fontWeight: theme.typography.fontWeightRegular,
-    },
-    btn: {
-      fontWeight: 'bold',
-      color: '#fff',  
-    }
-  }))
-  const classes = useStyles()
+  
+  const classes = styleObject()
   const [expanded, setExpanded] = useState(false)
   const [families, setFamilies] = useState([])
   const [genres, setGenres] = useState([])
   useEffect(() => {
-    specieDescription!=null&&setFlagAlert({sucessSendDescription: false})
-
     getAllFamilies((databaseFromFirebase) => {
       if(typeof databaseFromFirebase === 'undefined' || databaseFromFirebase === null) {
         setFamilies([])
@@ -183,7 +118,6 @@ export default function App() {
       setSpecieDescription({})
     }) 
     .catch((err) => {
-      console.log(err)
       setFlagAlert({errorSendDescription: true})})
       setTimeout(() => setFlagAlert({errorSendDescription: false}), 8000)
   }
@@ -224,7 +158,6 @@ export default function App() {
                       id="family"
                       value={family}
                       onChange={(event, newValue) => {
-                        console.log('newValue', newValue)
                         setFamily(newValue)
                         setGenus('')
                         if(typeof newValue === 'undefined'||newValue === null){
@@ -247,6 +180,7 @@ export default function App() {
                     <Autocomplete
                       required
                       id="genus"
+                      disabled={family?false:true}
                       value={genus}
                       onChange={(event, newValue) => {
                         setGenus(newValue)
