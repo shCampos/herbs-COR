@@ -34,10 +34,9 @@ async function getGenusKey(familyKey, genus) {
 	return genusKey
 }
 
-export async function postDescription(family, genus, description) {
-	const familyKey = await getFamilyKey(family)
-	const genusKey = await getGenusKey(familyKey, genus)
-	console.log('OISAHSOAIHO', description)
+export async function postDescription(familyName, genusName, description) {
+	const familyKey = await getFamilyKey(familyName)
+	const genusKey = await getGenusKey(familyKey, genusName)	
 	await firebase.database().ref('families/'+familyKey+'/genus/'+genusKey+'/species/')
 		.push(description)
 }

@@ -179,11 +179,13 @@ export default function App() {
     postDescription(family.name, genus.name, specieDescription)
     .then(() => {
       setFlagAlert({sucessSendDescription: true})
+      setTimeout(() => setFlagAlert({sucessSendDescription: false}), 8000)
       setSpecieDescription({})
     }) 
     .catch((err) => {
       console.log(err)
       setFlagAlert({errorSendDescription: true})})
+      setTimeout(() => setFlagAlert({errorSendDescription: false}), 8000)
   }
 
   return (
@@ -323,7 +325,7 @@ export default function App() {
                 </Button>
               </form>
             ):(
-              <Alert severity="info" style={{width: '100%'}}>
+              <Alert variant="outlined" severity="info" style={{width: '100%'}}>
                 <AlertTitle>Info</AlertTitle>
                 Em construção
               </Alert>
@@ -342,10 +344,10 @@ export default function App() {
             <form onSubmit={handleFormSubmit(newDescription)} autoComplete="off" style={{width: '100%'}}>
               <Grid container fullWidth style={{marginBottom: '10px'}}>
                 {(flagAlert.sucessSendDescription)&&(
-                  <Alert style={{width: '100%'}} severity="success">Descrição enviada ao banco de dados!</Alert>
+                  <Alert variant="outlined" style={{width: '100%'}} severity="success">Descrição enviada ao banco de dados!</Alert>
                 )}
                 {(flagAlert.errorSendDescription)&&(
-                  <Alert style={{width: '100%'}} severity="error">Erro em enviar descrição ao banco de dados.</Alert>
+                  <Alert variant="outlined" style={{width: '100%'}} severity="error">Erro em enviar descrição ao banco de dados.</Alert>
                 )}
               </Grid>
               <Grid container spacing={4}>
@@ -355,6 +357,7 @@ export default function App() {
                     id="family"
                     value={family}
                     onChange={(event, newValue) => {
+                      typeof newValue == 'undefined'||newValue == null&&
                       typeof newValue.name == 'undefined'||newValue.name == null?setFamily({name: newValue}):setFamily(newValue)
                       if(typeof newValue.genus == 'undefined'||newValue.genus == null) {
                         setGenres([])
@@ -364,7 +367,7 @@ export default function App() {
                       }
                       setGenus('')
                       if(!families.includes(newValue)){
-                        (genres[0]=='Banco de dados vazio')?setFamilies([newValue]):setFamilies([...families, newValue])
+                        (genres[0]==='Banco de dados vazio')?setFamilies([newValue]):setFamilies([...families, newValue])
                         postNewFamily({
                           name: newValue
                         })
@@ -395,13 +398,13 @@ export default function App() {
                     value={genus}
                     disabled={family?false:true}
                     onChange={(event, newValue) => {
-                      setGenus(newValue)
+                      setGenus({name: newValue})
                       if(!genres.includes(newValue)){
-                        setGenres([...genres, newValue])
+                        setGenres([...genres, {name: newValue}])
                         postNewGenusByFamilyName(family.name, newValue)
                       }
                     }}
-                    filterOptions={(options, params) => {                      
+                    filterOptions={(options, params) => {              
                       const filtered = filter(options, params)
                       params.inputValue!==''&&filtered.push(params.inputValue)
                       return filtered
@@ -416,7 +419,6 @@ export default function App() {
                       }
                       return option.name
                     }}
-                    getOptionLabel={(option) => option.name}
                     renderInput={(params) => <TextField {...params} label="Gênero" variant="outlined" />}
                   />
                 </Grid>
