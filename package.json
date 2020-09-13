@@ -14,7 +14,8 @@
     "node-fetch": "^2.6.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-scripts": "3.4.3"
+    "react-scripts": "3.4.3",
+    "string-similarity": "^4.0.2"
   },
   "scripts": {
     "start": "react-scripts start",

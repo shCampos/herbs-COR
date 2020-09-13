@@ -17,19 +17,21 @@ import {
   Select,
   TextField,
   Typography } from '@material-ui/core'
-
 import { Alert, AlertTitle } from '@material-ui/lab'
 import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete'
-import { Brightness7, ExpandMore, GitHub} from '@material-ui/icons'
+import { Brightness7, ExpandMore, GitHub } from '@material-ui/icons'
 
 import { 
-  postDescription,
   getAllFamilies,
+  getAllSpecies,
+  postDescription,
   postNewFamily,
   postNewGenusByFamilyName } from './utils/firebase.js'
 
 import { themeObject } from './assets/themeObject.js'
 import { styleObject } from './assets/styleObject.js'
+
+import { compareDescriptions } from './utils/compareDescriptions.js'
 
 const useDarkMode = () => {
   const [theme, setTheme] = useState(themeObject)
@@ -59,17 +61,17 @@ export default function App() {
     const userTheme = localStorage.getItem('@lineus/theme')
     userTheme==='dark'&&toogleDarkMode()
   }, [])
-  
   const classes = styleObject()
+
   const [expanded, setExpanded] = useState(false)
   const [families, setFamilies] = useState([])
   const [genres, setGenres] = useState([])
   useEffect(() => {
-    getAllFamilies((databaseFromFirebase) => {
-      if(typeof databaseFromFirebase === 'undefined' || databaseFromFirebase === null) {
+    getAllFamilies((dataFromFirebase) => {
+      if(typeof dataFromFirebase === 'undefined' || dataFromFirebase === null) {
         setFamilies([])
       } else {
-        const familiesList = Object.entries(databaseFromFirebase).map((fam) => typeof fam[1].name !== 'undefined'&&fam[1])
+        const familiesList = Object.entries(dataFromFirebase).map((fam) => typeof fam[1].name !== 'undefined'&&fam[1])
         const withFirstLetterFamiliesList = familiesList.map((fam) => {
           return {
             ...fam,
@@ -78,7 +80,7 @@ export default function App() {
         })
         const sortedFamiliesList = withFirstLetterFamiliesList.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))
         setFamilies(sortedFamiliesList)
-      }           
+      }
     })
   }, [])
   const [family, setFamily] = useState('')
@@ -88,6 +90,7 @@ export default function App() {
   const [flagAlert, setFlagAlert] = useState({
     sucessSendDescription:false,
     errorSendDescription: false,
+    missingParams: false,
     searched: false,
   })
   const handlePanelChange = (panel) => (event, isExpanded) => {
@@ -108,7 +111,9 @@ export default function App() {
     callback()
   }
   const searchSpecie = () => {
+    compareDescriptions(searchParams)
     setFlagAlert({searched: true})
+
   }
   const newDescription = () => {
     postDescription(family.name, genus.name, specieDescription)
@@ -118,8 +123,9 @@ export default function App() {
       setSpecieDescription({})
     }) 
     .catch((err) => {
-      setFlagAlert({errorSendDescription: true})})
+      setFlagAlert({errorSendDescription: true})
       setTimeout(() => setFlagAlert({errorSendDescription: false}), 8000)
+    })
   }
 
   return (
@@ -172,6 +178,7 @@ export default function App() {
                         }
                       }}
                       options={families}
+                      groupBy={(option) => option.firstLetter}
                       getOptionLabel={(option) => option.name}
                       renderInput={(params) => <TextField {...params} label="Família" variant="outlined" />}
                     />
@@ -278,10 +285,13 @@ export default function App() {
             <form onSubmit={handleFormSubmit(newDescription)} autoComplete="off" style={{width: '100%'}}>
               <Grid container fullWidth style={{marginBottom: '10px'}}>
                 {(flagAlert.sucessSendDescription)&&(
-                  <Alert variant="outlined" style={{width: '100%'}} severity="success">Descrição enviada ao banco de dados!</Alert>
+                  <Alert variant="outlined" style={{width: '100%'}} severity="success">Descrição enviada ao banco de dados.</Alert>
                 )}
                 {(flagAlert.errorSendDescription)&&(
                   <Alert variant="outlined" style={{width: '100%'}} severity="error">Erro em enviar descrição ao banco de dados.</Alert>
+                )}
+                {(flagAlert.missingParams)&&(
+                  <Alert variant="outlined" style={{width: '100%'}} severity="error">A família ou o gênero está faltando.</Alert>
                 )}
               </Grid>
               <Grid container spacing={4}>
@@ -291,7 +301,7 @@ export default function App() {
                     id="family"
                     value={family}
                     onChange={(event, newValue) => {
-                      typeof newValue == 'undefined'||newValue == null&&
+                      typeof newValue != 'undefined'||newValue != null&&
                       typeof newValue.name == 'undefined'||newValue.name == null?setFamily({name: newValue}):setFamily(newValue)
                       if(typeof newValue.genus == 'undefined'||newValue.genus == null) {
                         setGenres([])
@@ -313,6 +323,7 @@ export default function App() {
                       return filtered;
                     }}
                     options={families}
+                    groupBy={(option) => option.firstLetter}
                     getOptionLabel={(option) => {
                       if (typeof option === 'string') {
                         return option
