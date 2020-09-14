@@ -77,7 +77,7 @@ export default function App() {
     sucessSendDescription:false,
     errorSendDescription: false,
     missingParams: false,
-    searched: false,
+    searched: true,
   })
 
   const [families, setFamilies] = useState([])
@@ -104,7 +104,7 @@ export default function App() {
   const [genus, setGenus] = useState('')
   const [searchParams, setSearchParams] = useState({ })
   const [specieDescription, setSpecieDescription] = useState({ })
-  const [probableSpecies, setProbableSpecies] = useState([{name: 'Nome especie', percentage: 50}, {name: 'Blabla bleble', percentage: 40}])
+  const [probableSpecies, setProbableSpecies] = useState([{scientificName: 'Carregando', rating: 0}])
 
   const handleFormSubmit = callback => event => {
     event.preventDefault()
@@ -124,8 +124,10 @@ export default function App() {
     setFlagAlert({searched: false})
   }
 
-  const searchSpecie = () => {
-    compareDescriptions(searchParams)
+  const searchSpecie = async () => {
+    const auxProbableSpecies = await compareDescriptions(searchParams.plantDescription)
+    console.log(auxProbableSpecies)
+    setProbableSpecies(auxProbableSpecies)
     setFlagAlert({searched: true})
   }
 
@@ -220,60 +222,12 @@ export default function App() {
                     />
                   </Grid>
                 </Grid>
-                <Grid container spacing={4}>
-                  <Grid item xs={6}>
-                    <FormControl variant="outlined" className={classes.input}>
-                      <InputLabel id="habitLabel">Hábito</InputLabel>
-                      <Select
-                        required
-                        labelId="habitLabel"
-                        id="plantHabit"
-                        name="plantHabit"
-                        onChange={handleFormSearchChange}>
-                        <MenuItem value={'Árvore'}>Árvore</MenuItem>
-                        <MenuItem value={'Volúvel'}>Volúvel</MenuItem>
-                        <MenuItem value={'Erva'}>Erva</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  
-                  <Grid item xs={6}>
-                    <FormControl variant="outlined" className={classes.input}>
-                      <InputLabel id="heightLabel">Altura</InputLabel>
-                      <OutlinedInput
-                        required
-                        id="plantHeight"
-                        name="plantHeight"
-                        onChange={handleFormSearchChange}
-                        labelId="heightLabel"
-                        type="number"
-                        //value={values.amount}
-                        //onChange={handleChange('amount')}
-                        endAdornment={<InputAdornment position="start">m</InputAdornment>}
-                      />
-                    </FormControl>
-                  </Grid>
-                </Grid>
-                
-                <Typography variant="overline">Folha</Typography>
-                <TextField 
-                  required
-                  id="leafDescription"
-                  name="leafDescription"
-                  onChange={handleFormSearchChange}
-                  fullWidth
-                  multiline
-                  rows={5}                  
-                  className={classes.input}
-                  label="Descrição"
-                  variant="outlined"
-                />
 
-                <Typography variant="overline">Inflorescência (se tiver) e flor</Typography>
+                <Typography variant="overline">Descrição da planta</Typography>
                 <TextField
                   required
-                  id="flowerDescription"
-                  name="flowerDescription"
+                  id="plantDescription"
+                  name="plantDescription"
                   onChange={handleFormSearchChange}
                   fullWidth
                   multiline
@@ -292,21 +246,22 @@ export default function App() {
                 <List style={{paddingTop: '0px'}}>
                   {
                     probableSpecies.map((specie) => {
-                      const specieName = specie.name.split(' ').slice(0,2).join(' ')
-                      const specieAuthor = specie.name.split(' ').slice(2).join(' ')
+                      const specieName = specie.scientificName.split(' ').slice(0,2).join(' ')
+                      const specieAuthor = specie.scientificName.split(' ').slice(2).join(' ')
+                      const specieRating = Math.round(specie.rating*100)
                       return (
-                        <div style={{width: '100%'}}>
-                          <ListItem>
+                        <div className={classes.listItemResult}>
+                          <ListItem style={{width: '100%'}}>
                             <ListItemAvatar>
-                              <Avatar className={classes.porcentagem}>{specie.percentage}%</Avatar>
+                              <Avatar className={classes.porcentagem}>{specieRating}%</Avatar>
                             </ListItemAvatar>
                             <ListItemText
                               primary={<span><font style={{fontStyle: 'italic'}}>{specieName}</font> {specieAuthor}</span>}
                               secondary="LINKS EXTERNOS EM IMPLEMENTAÇÃO"/>
-                          </ListItem>      
-                          <Divider />
+                          </ListItem>
+                          <Divider style={{width: '100%'}}/>
                         </div>
-                      )                    
+                      )
                     })
                   }                
                 </List>

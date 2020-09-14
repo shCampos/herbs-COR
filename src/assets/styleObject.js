@@ -49,5 +49,8 @@ export const styleObject = makeStyles((theme) => ({
   },
   porcentagem: {
     backgroundColor: '#3eb827'
+  },
+  listItemResult: {
+    width: '100%'
   }
 }))
