@@ -230,7 +230,7 @@ export default function App() {
             {!flagAlert.searched?(
               <div style={{width: '-webkit-fill-available'}}>
                 <AppBar position="static">
-                  <Tabs value={tabValue} onChange={handleTabChange} variant="fullWidth" centered style={{width: '100%'}}>
+                  <Tabs value={tabValue} onChange={handleTabChange} className={classes.tab} variant="fullWidth" centered style={{width: '100%'}}>
                     <Tab label="PELO NOME" {...a11yProps(0)} />
                     <Tab label="PELA DESCRIÇÃO" {...a11yProps(1)} />
                   </Tabs>
