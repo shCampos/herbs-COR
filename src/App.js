@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react'
+import PropTypes from 'prop-types'
 import { createMuiTheme } from '@material-ui/core/styles'
 import {
   Avatar,
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  AppBar,
+  Box,
   Button,
   CssBaseline,
   Divider,
@@ -20,6 +23,8 @@ import {
   MenuItem,
   OutlinedInput,
   Select,
+  Tabs,
+  Tab,
   TextField,
   ThemeProvider,
   Typography } from '@material-ui/core'
@@ -38,6 +43,39 @@ import { themeObject } from './assets/themeObject.js'
 import { styleObject } from './assets/styleObject.js'
 
 import { compareDescriptions } from './utils/compareDescriptions.js'
+
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box p={3}>
+          {children}
+        </Box>
+      )}
+    </div>
+  )
+}
+
+TabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.any.isRequired,
+  value: PropTypes.any.isRequired,
+};
+
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
 
 const useDarkMode = () => {
   const [theme, setTheme] = useState(themeObject)
@@ -73,11 +111,15 @@ export default function App() {
   const handlePanelChange = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false)
   }
+  const [tabValue, setTabValue] = useState(0)
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
+  };
   const [flagAlert, setFlagAlert] = useState({
     sucessSendDescription:false,
     errorSendDescription: false,
     missingParams: false,
-    searched: true,
+    searched: false,
   })
 
   const [families, setFamilies] = useState([])
@@ -120,6 +162,7 @@ export default function App() {
     auxDescriptionValues[event.target.name] = event.target.value
     setSpecieDescription(auxDescriptionValues)
   }
+
   const toogleShowForm = () => {
     setFlagAlert({searched: false})
   }
@@ -169,7 +212,7 @@ export default function App() {
             {
             !flagAlert.searched?(
               <Typography className={classes.heading} variant="overline">
-                Pesquisar uma espécie
+                Pesquisar uma espécie pela descrição
               </Typography>
             ):(
               <Typography className={classes.heading} variant="overline">
@@ -180,67 +223,136 @@ export default function App() {
           </AccordionSummary>
           <AccordionDetails fullWidth className={classes.acordionBody}>
             {!flagAlert.searched?(
-              <form item autoComplete="off" style={{width: '100%'}} onSubmit={handleFormSubmit(searchSpecie)}>
-                <Grid container spacing={4}>
-                  <Grid item xs={6}>
-                    <Autocomplete
-                      required
-                      id="family"
-                      value={family}
-                      onChange={(event, newValue) => {
-                        setFamily(newValue)
-                        setGenus('')
-                        if(typeof newValue === 'undefined'||newValue === null){
-                          setGenres([])
-                        } else {
-                          if(typeof newValue.genus == 'undefined'||newValue.genus == null) {
-                            setGenres([])
-                          } else {
-                            const auxGenres = Object.entries(newValue.genus).map((gen) => gen[1])
-                            setGenres(auxGenres)
-                          }
-                        }
-                      }}
-                      options={families}
-                      groupBy={(option) => option.firstLetter}
-                      getOptionLabel={(option) => option.name}
-                      renderInput={(params) => <TextField {...params} label="Família" variant="outlined" />}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Autocomplete
-                      required
-                      id="genus"
-                      disabled={family?false:true}
-                      value={genus}
-                      onChange={(event, newValue) => {
-                        setGenus(newValue)
-                      }}
-                      options={genres}
-                      getOptionLabel={(option) => option.name}
-                      renderInput={(params) => <TextField {...params} label="Gênero" variant="outlined" />}
-                    />
-                  </Grid>
-                </Grid>
+              <div>
+                <AppBar position="static">
+                  <Tabs value={tabValue} onChange={handleTabChange} variant="fullWidth" centered style={{width: '100%'}}>
+                    <Tab label="PELO NOME" {...a11yProps(0)} />
+                    <Tab label="PELA DESCRIÇÃO" {...a11yProps(1)} />
+                  </Tabs>
+                </AppBar>
+                <TabPanel value={tabValue} index={0}>
+                  <form item autoComplete="off" style={{width: '100%'}} onSubmit={handleFormSubmit(searchSpecie)}>
+                    <Grid container spacing={4}>
+                      <Grid item xs={6}>
+                        <Autocomplete
+                          required
+                          id="family"
+                          value={family}
+                          onChange={(event, newValue) => {
+                            setFamily(newValue)
+                            setGenus('')
+                            if(typeof newValue === 'undefined'||newValue === null){
+                              setGenres([])
+                            } else {
+                              if(typeof newValue.genus == 'undefined'||newValue.genus == null) {
+                                setGenres([])
+                              } else {
+                                const auxGenres = Object.entries(newValue.genus).map((gen) => gen[1])
+                                setGenres(auxGenres)
+                              }
+                            }
+                          }}
+                          options={families}
+                          groupBy={(option) => option.firstLetter}
+                          getOptionLabel={(option) => option.name}
+                          renderInput={(params) => <TextField {...params} label="Família" variant="outlined" />}
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Autocomplete
+                          required
+                          id="genus"
+                          disabled={family?false:true}
+                          value={genus}
+                          onChange={(event, newValue) => {
+                            setGenus(newValue)
+                          }}
+                          options={genres}
+                          getOptionLabel={(option) => option.name}
+                          renderInput={(params) => <TextField {...params} label="Gênero" variant="outlined" />}
+                        />
+                      </Grid>
+                    </Grid>
 
-                <Typography variant="overline">Descrição da planta</Typography>
-                <TextField
-                  required
-                  id="plantDescription"
-                  name="plantDescription"
-                  onChange={handleFormSearchChange}
-                  fullWidth
-                  multiline
-                  rows={5}                  
-                  className={classes.input}
-                  label="Descrição"
-                  variant="outlined"
-                />
+                    <TextField
+                      required
+                      id="specie"
+                      name="specie"
+                      onChange={handleFormSearchChange}
+                      fullWidth
+                      className={classes.input}
+                      label="Espécie"
+                      variant="outlined"
+                    />
+                    <Button type="submit" variant="contained" className={classes.btn} color="primary">
+                      Pesquisar
+                    </Button>
+                  </form>
+                </TabPanel>
+                <TabPanel value={tabValue} index={1}>
+                  <form item autoComplete="off" style={{width: '100%'}} onSubmit={handleFormSubmit(searchSpecie)}>
+                    <Grid container spacing={4}>
+                      <Grid item xs={6}>
+                        <Autocomplete
+                          required
+                          id="family"
+                          value={family}
+                          onChange={(event, newValue) => {
+                            setFamily(newValue)
+                            setGenus('')
+                            if(typeof newValue === 'undefined'||newValue === null){
+                              setGenres([])
+                            } else {
+                              if(typeof newValue.genus == 'undefined'||newValue.genus == null) {
+                                setGenres([])
+                              } else {
+                                const auxGenres = Object.entries(newValue.genus).map((gen) => gen[1])
+                                setGenres(auxGenres)
+                              }
+                            }
+                          }}
+                          options={families}
+                          groupBy={(option) => option.firstLetter}
+                          getOptionLabel={(option) => option.name}
+                          renderInput={(params) => <TextField {...params} label="Família" variant="outlined" />}
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Autocomplete
+                          required
+                          id="genus"
+                          disabled={family?false:true}
+                          value={genus}
+                          onChange={(event, newValue) => {
+                            setGenus(newValue)
+                          }}
+                          options={genres}
+                          getOptionLabel={(option) => option.name}
+                          renderInput={(params) => <TextField {...params} label="Gênero" variant="outlined" />}
+                        />
+                      </Grid>
+                    </Grid>
 
-                <Button type="submit" variant="contained" className={classes.btn} color="primary">
-                  Pesquisar
-                </Button>
-              </form>
+                    <Typography variant="overline">Descrição da planta</Typography>
+                    <TextField
+                      required
+                      id="plantDescription"
+                      name="plantDescription"
+                      onChange={handleFormSearchChange}
+                      fullWidth
+                      multiline
+                      rows={5}                  
+                      className={classes.input}
+                      label="Descrição"
+                      variant="outlined"
+                    />
+
+                    <Button type="submit" variant="contained" className={classes.btn} color="primary">
+                      Pesquisar
+                    </Button>
+                  </form>
+                </TabPanel>
+              </div>
             ):(
               <div>
                 <List style={{paddingTop: '0px'}}>
@@ -265,7 +377,13 @@ export default function App() {
                     })
                   }                
                 </List>
-                <Button variant="contained" className={classes.btn} color="primary" onClick={toogleShowForm}>Continuar pesquisando</Button>
+                <Button 
+                  variant="contained"
+                  className={classes.btn}
+                  color="primary"
+                  onClick={toogleShowForm}>
+                  Continuar pesquisando
+                </Button>
               </div>
             )}
           </AccordionDetails>
@@ -273,7 +391,7 @@ export default function App() {
 
         <Accordion expanded={expanded === 'panel2'} onChange={handlePanelChange('panel2')}>
           <AccordionSummary
-          expandIcon={<ExpandMore />} aria-controls="panel1a-content" id="panel1a-header" className={classes.acordionHeader}>
+            expandIcon={<ExpandMore />} aria-controls="panel1a-content" id="panel1a-header" className={classes.acordionHeader}>
             <Typography className={classes.heading} variant="overline">
               Adicionar uma espécie
             </Typography>
