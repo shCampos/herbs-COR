@@ -228,7 +228,7 @@ export default function App() {
           </AccordionSummary>
           <AccordionDetails fullWidth className={classes.acordionBody}>
             {!flagAlert.searched?(
-              <div>
+              <div style={{width: '-webkit-fill-available'}}>
                 <AppBar position="static">
                   <Tabs value={tabValue} onChange={handleTabChange} variant="fullWidth" centered style={{width: '100%'}}>
                     <Tab label="PELO NOME" {...a11yProps(0)} />
@@ -279,7 +279,6 @@ export default function App() {
                       </Grid>
                     </Grid>
 
-                    <Typography variant="overline">Espécie</Typography>
                     <TextField
                       required
                       id="specie"

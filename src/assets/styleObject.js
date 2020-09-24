@@ -14,6 +14,8 @@ export const styleObject = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
     width: width,
+    minWidth: width,
+    maxWidth: width,
     minHeight: height-48,
     paddingLeft: '10px',
     paddingRight: '10px',
@@ -36,6 +38,7 @@ export const styleObject = makeStyles((theme) => ({
     color: '#fff'
   },
   input: {
+    marginTop: '10px',
     marginBottom: '10px',
     width: '100%',
   },
