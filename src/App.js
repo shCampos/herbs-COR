@@ -49,6 +49,7 @@ function TabPanel(props) {
 
   return (
     <div
+      style={{width: '100%'}}
       role="tabpanel"
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
@@ -167,11 +168,15 @@ export default function App() {
     setFlagAlert({searched: false})
   }
 
-  const searchSpecie = async () => {
+  const searchSpecieByDescription = async () => {
     const auxProbableSpecies = await compareDescriptions(searchParams.plantDescription)
     console.log(auxProbableSpecies)
     setProbableSpecies(auxProbableSpecies)
     setFlagAlert({searched: true})
+  }
+
+  const searchSpecieByName = async () => {
+    console.log('foi')
   }
 
   const newDescription = () => {
@@ -231,7 +236,7 @@ export default function App() {
                   </Tabs>
                 </AppBar>
                 <TabPanel value={tabValue} index={0}>
-                  <form item autoComplete="off" style={{width: '100%'}} onSubmit={handleFormSubmit(searchSpecie)}>
+                  <form item autoComplete="off" style={{width: '100%'}} onSubmit={handleFormSubmit(searchSpecieByName)}>
                     <Grid container spacing={4}>
                       <Grid item xs={6}>
                         <Autocomplete
@@ -274,6 +279,7 @@ export default function App() {
                       </Grid>
                     </Grid>
 
+                    <Typography variant="overline">Espécie</Typography>
                     <TextField
                       required
                       id="specie"
@@ -290,7 +296,7 @@ export default function App() {
                   </form>
                 </TabPanel>
                 <TabPanel value={tabValue} index={1}>
-                  <form item autoComplete="off" style={{width: '100%'}} onSubmit={handleFormSubmit(searchSpecie)}>
+                  <form item autoComplete="off" style={{width: '100%'}} onSubmit={handleFormSubmit(searchSpecieByDescription)}>
                     <Grid container spacing={4}>
                       <Grid item xs={6}>
                         <Autocomplete
