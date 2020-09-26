@@ -1,8 +1,7 @@
 import { findBestMatch } from 'string-similarity'
 import { getAllSpecies } from './firebase.js'
 
-export async function compareDescriptions(userDescription) {
-	const allSpecies = await getAllSpecies()
+export async function compareDescriptions(userDescription, allSpecies) {
 	const justDescriptions = await allSpecies.map((specie) => specie.description)	
 	const probableSpecies = await findBestMatch(userDescription, justDescriptions)
 	probableSpecies.ratings.sort((a, b) => -(a.rating>b.rating)||+(a.rating<b.rating))

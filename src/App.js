@@ -141,6 +141,24 @@ export default function App() {
         setFamilies(sortedFamiliesList)
       }
     })
+  }, [])  
+  const [species, setSpecies] = useState([])
+  useEffect(() => {
+    getAllSpecies((speciesFromDb) => {
+      if(typeof speciesFromDb === 'undefined' || speciesFromDb === null) {
+        setSpecies([])
+      } else {
+        const speciesList = Object.entries(speciesFromDb).map((specie) => typeof specie[1].scientificName !== 'undefined'&&specie[1])
+        const withFirstLetterSpeciesList = speciesList.map((specie) => {
+          return {
+            ...specie,
+            firstLetter: specie.scientificName[0].toUpperCase()
+          }
+        })
+        const sortedSpeciesList = withFirstLetterSpeciesList.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))
+        setSpecies(sortedSpeciesList)
+      }
+    })
   }, [])
 
   const [family, setFamily] = useState('')
@@ -169,7 +187,7 @@ export default function App() {
   }
 
   const searchSpecieByDescription = async () => {
-    const auxProbableSpecies = await compareDescriptions(searchParams.plantDescription)
+    const auxProbableSpecies = await compareDescriptions(searchParams.plantDescription, species)
     console.log(auxProbableSpecies)
     setProbableSpecies(auxProbableSpecies)
     setFlagAlert({searched: true})
@@ -237,57 +255,27 @@ export default function App() {
                 </AppBar>
                 <TabPanel value={tabValue} index={0}>
                   <form item autoComplete="off" style={{width: '100%'}} onSubmit={handleFormSubmit(searchSpecieByName)}>
-                    <Grid container spacing={4}>
-                      <Grid item xs={6}>
-                        <Autocomplete
-                          required
-                          id="family"
-                          value={family}
-                          onChange={(event, newValue) => {
-                            setFamily(newValue)
-                            setGenus('')
-                            if(typeof newValue === 'undefined'||newValue === null){
-                              setGenres([])
-                            } else {
-                              if(typeof newValue.genus == 'undefined'||newValue.genus == null) {
-                                setGenres([])
-                              } else {
-                                const auxGenres = Object.entries(newValue.genus).map((gen) => gen[1])
-                                setGenres(auxGenres)
-                              }
-                            }
-                          }}
-                          options={families}
-                          groupBy={(option) => option.firstLetter}
-                          getOptionLabel={(option) => option.name}
-                          renderInput={(params) => <TextField {...params} label="Família" variant="outlined" />}
-                        />
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Autocomplete
-                          required
-                          id="genus"
-                          disabled={family?false:true}
-                          value={genus}
-                          onChange={(event, newValue) => {
-                            setGenus(newValue)
-                          }}
-                          options={genres}
-                          getOptionLabel={(option) => option.name}
-                          renderInput={(params) => <TextField {...params} label="Gênero" variant="outlined" />}
-                        />
-                      </Grid>
-                    </Grid>
-
-                    <TextField
+                    <Autocomplete
                       required
                       id="specie"
-                      name="specie"
-                      onChange={handleFormSearchChange}
-                      fullWidth
                       className={classes.input}
-                      label="Espécie"
-                      variant="outlined"
+                      value={searchParams}
+                      onChange={(event, newValue) => {
+                        console.log('MUDOU', species)
+                        setSearchParams({scientificName: newValue})
+                      }}
+                      options={species}
+                      groupBy={(option) => option.firstLetter}
+                      getOptionLabel={(option) => {
+                        if (typeof option === 'string') {
+                          return option
+                        }
+                        if (option.inputValue) {
+                          return option.inputValue
+                        }
+                        return option.scientificName
+                      }}
+                      renderInput={(params) => <TextField {...params} label="Nome da espécie" variant="outlined" />}
                     />
                     <Button type="submit" variant="contained" className={classes.btn} color="primary">
                       Pesquisar

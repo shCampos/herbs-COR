@@ -48,7 +48,7 @@ export async function getAllFamilies(setFamilies) {
   })
 }
 
-export async function getAllSpecies() {
+export async function getAllSpecies(setSpecies) {
 	let speciesList = []
 	await firebase.database().ref('families/')
 	.on('value', (dataSnapshot) => {
@@ -57,10 +57,10 @@ export async function getAllSpecies() {
     	Object.entries(gen[1].species).map((species)=>{
     		speciesList.push(species[1])
     	})
-    	console.log(speciesList)
     }))
+		setSpecies(speciesList)
   })
-  return speciesList
+  console.log(speciesList)
 }
 
 export async function postNewFamily(family) {
