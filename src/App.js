@@ -38,10 +38,14 @@ import { Brightness7, ExpandMore, GitHub } from '@material-ui/icons'
 
 import { 
   getAllFamilies,
+  getFamilyByName,
+  getGenreByFamilyKey,
+  getGenreByName,
   getAllSpecies,
-  postDescription,
   postNewFamily,
-  postNewGenusByFamilyName } from './utils/firebase.js'
+  postNewGenre,
+  postSpecieDescription,
+} from './utils/firebase.js'
 
 import { themeObject } from './assets/themeObject.js'
 import { styleObject } from './assets/styleObject.js'
@@ -125,16 +129,17 @@ export default function App() {
     errorSendDescription: false,
     missingParams: false,
     searched: false,
+    specieInDb: false,
   })
 
   const [families, setFamilies] = useState([])
-  const [genres, setGenres] = useState([])
   useEffect(() => {
     getAllFamilies((dataFromFirebase) => {
       if(typeof dataFromFirebase === 'undefined' || dataFromFirebase === null) {
         setFamilies([])
       } else {
-        const familiesList = Object.entries(dataFromFirebase).map((fam) => typeof fam[1].name !== 'undefined'&&fam[1])
+        const familiesList = Object.entries(dataFromFirebase).map((fam) => typeof fam[1].name !== 'undefined'&&{key: fam[0], ...fam[1]})
+        console.log(familiesList)
         const withFirstLetterFamiliesList = familiesList.map((fam) => {
           return {
             ...fam,
@@ -145,28 +150,29 @@ export default function App() {
         setFamilies(sortedFamiliesList)
       }
     })
-  }, [])  
+  }, [])
+  const [genres, setGenres] = useState([])
   const [species, setSpecies] = useState([])
   useEffect(() => {
-    getAllSpecies((speciesFromDb) => {
-      if(typeof speciesFromDb === 'undefined' || speciesFromDb === null) {
-        setSpecies([])
-      } else {
-        const speciesList = Object.entries(speciesFromDb).map((specie) => typeof specie[1].scientificName !== 'undefined'&&specie[1])
-        const withFirstLetterSpeciesList = speciesList.map((specie) => {
-          return {
-            ...specie,
-            firstLetter: specie.scientificName[0].toUpperCase()
-          }
-        })
-        const sortedSpeciesList = withFirstLetterSpeciesList.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))
-        setSpecies(sortedSpeciesList)
-      }
-    })
+    // getAllSpecies((speciesFromDb) => {
+    //   if(typeof speciesFromDb === 'undefined' || speciesFromDb === null) {
+    //     setSpecies([])
+    //   } else {
+    //     const speciesList = Object.entries(speciesFromDb).map((specie) => typeof specie[1].scientificName !== 'undefined'&&specie[1])
+    //     const withFirstLetterSpeciesList = speciesList.map((specie) => {
+    //       return {
+    //         ...specie,
+    //         firstLetter: specie.scientificName[0].toUpperCase()
+    //       }
+    //     })
+    //     const sortedSpeciesList = withFirstLetterSpeciesList.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))
+    //     setSpecies(sortedSpeciesList)
+    //   }
+    // })
   }, [])
 
-  const [family, setFamily] = useState('')
-  const [genus, setGenus] = useState('')
+  const [currentFamily, setCurrentFamily] = useState('')
+  const [currentGenre, setCurrentGenre] = useState('')
   const [currentSpecie, setCurrentSpecie] = useState(null)
   const [searchParams, setSearchParams] = useState({ })
   const [specieDescription, setSpecieDescription] = useState({ })
@@ -199,16 +205,25 @@ export default function App() {
   }
 
   const newDescription = () => {
-    postDescription(family.name, genus.name, specieDescription)
-    .then(() => {
-      setFlagAlert({sucessSendDescription: true})
-      setTimeout(() => setFlagAlert({sucessSendDescription: false}), 8000)
-      setSpecieDescription({})
-    }) 
-    .catch((err) => {
-      setFlagAlert({errorSendDescription: true})
-      setTimeout(() => setFlagAlert({errorSendDescription: false}), 8000)
+    species.map((specie) => {
+      if(specieDescription.scientificName == specie.scientificName) {
+        setFlagAlert({specieInDb: true})
+      }
     })
+    if(!flagAlert.specieInDb) {
+      console.log(currentFamily.key, currentGenre.key, specieDescription)
+      postSpecieDescription(currentFamily.key, currentGenre.key, specieDescription)
+      .then(() => {
+        setFlagAlert({sucessSendDescription: true})
+        setTimeout(() => setFlagAlert({sucessSendDescription: false}), 8000)
+        setSpecieDescription({})
+      }) 
+      .catch((err) => {
+        console.log(err)
+        setFlagAlert({errorSendDescription: true})
+        setTimeout(() => setFlagAlert({errorSendDescription: false}), 8000)
+      })
+    }
   }  
 
   return (
@@ -231,174 +246,175 @@ export default function App() {
       </Typography>
 
       <div>
-        <Accordion expanded={expanded === 'panel1'} onChange={handlePanelChange('panel1')}>
-          <AccordionSummary expandIcon={<ExpandMore />} aria-controls="panel1a-content" id="panel1a-header" className={classes.acordionHeader}>
-            {
-            !flagAlert.searched?(
-              <Typography className={classes.heading} variant="overline">
-                Pesquisar uma espécie
-              </Typography>
-            ):(
-              <Typography className={classes.heading} variant="overline">
-                Possíveis resultados
-              </Typography>
-            )
-            }
-          </AccordionSummary>
-          <AccordionDetails fullWidth className={classes.acordionBody}>
-            {!flagAlert.searched?(
-              <div style={{width: '-webkit-fill-available'}}>
-                <AppBar position="static">
-                  <Tabs value={tabValue} onChange={handleTabChange} className={classes.tab} variant="fullWidth" centered style={{width: '100%'}}>
-                    <Tab label="PELO NOME" {...a11yProps(0)} />
-                    <Tab label="PELA DESCRIÇÃO" {...a11yProps(1)} />
-                  </Tabs>
-                </AppBar>
-                <TabPanel value={tabValue} index={0}>
-                  <Autocomplete
-                    required
-                    id="specie"
-                    className={classes.input}
-                    value={searchParams}
-                    options={species}
-                    onChange={(event, newValue) => setCurrentSpecie(newValue)}
-                    groupBy={(option) => option.firstLetter}
-                    getOptionLabel={(option) => {
-                      if (typeof option === 'string') {
-                        return option
-                      }
-                      if (option.inputValue) {
-                        return option.inputValue
-                      }
-                      return option.scientificName
-                    }}
-                    renderInput={(params) => <TextField {...params} label="Nome da espécie" variant="outlined" />}
-                  />
-                  {(currentSpecie)&&
-                    (
-                      <Card variant="outlined" style={{maxWidth: '484px'}}>
-                        <CardHeader
-                          style={{paddingBottom: '0px'}}
-                          title={
-                            <span>
-                              <i>{currentSpecie.scientificName.split(' ').slice(0,2).join(' ')} </i>
-                              {currentSpecie.scientificName.split(' ').slice(2).join(' ')}
-                            </span>
-                          }
-                          subheader={currentSpecie.family.toUpperCase()}
-                        />
-                        <CardContent style={{width: '100%'}}>                          
-                          <Typography variant="body2" component="p" style={{textAlign: 'justify'}}>
-                            {currentSpecie.description}
-                          </Typography>
-                        </CardContent>
-                        <CardActions>
-                          <Button size="small" className={classes.btn} disabled>Links externos</Button>
-                        </CardActions>
-                      </Card>
-                    )
-                  }
-                </TabPanel>
-                <TabPanel value={tabValue} index={1}>
-                  <form item autoComplete="off" style={{width: '100%'}} onSubmit={handleFormSubmit(searchSpecieByDescription)}>
-                    <Grid container spacing={4}>
-                      <Grid item xs={6}>
-                        <Autocomplete
-                          required
-                          id="family"
-                          value={family}
-                          onChange={(event, newValue) => {
-                            setFamily(newValue)
-                            setGenus('')
-                            if(typeof newValue === 'undefined'||newValue === null){
-                              setGenres([])
-                            } else {
-                              if(typeof newValue.genus == 'undefined'||newValue.genus == null) {
-                                setGenres([])
-                              } else {
-                                const auxGenres = Object.entries(newValue.genus).map((gen) => gen[1])
-                                setGenres(auxGenres)
-                              }
-                            }
-                          }}
-                          options={families}
-                          groupBy={(option) => option.firstLetter}
-                          getOptionLabel={(option) => option.name}
-                          renderInput={(params) => <TextField {...params} label="Família" variant="outlined" />}
-                        />
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Autocomplete
-                          required
-                          id="genus"
-                          disabled={family?false:true}
-                          value={genus}
-                          onChange={(event, newValue) => {
-                            setGenus(newValue)
-                          }}
-                          options={genres}
-                          getOptionLabel={(option) => option.name}
-                          renderInput={(params) => <TextField {...params} label="Gênero" variant="outlined" />}
-                        />
-                      </Grid>
-                    </Grid>
+{        
+        // <Accordion expanded={expanded === 'panel1'} onChange={handlePanelChange('panel1')}>
+        //   <AccordionSummary expandIcon={<ExpandMore />} aria-controls="panel1a-content" id="panel1a-header" className={classes.acordionHeader}>
+        //     {
+        //     !flagAlert.searched?(
+        //       <Typography className={classes.heading} variant="overline">
+        //         Pesquisar uma espécie
+        //       </Typography>
+        //     ):(
+        //       <Typography className={classes.heading} variant="overline">
+        //         Possíveis resultados
+        //       </Typography>
+        //     )
+        //     }
+        //   </AccordionSummary>
+        //   <AccordionDetails fullWidth className={classes.acordionBody}>
+        //     {!flagAlert.searched?(
+        //       <div style={{width: '-webkit-fill-available'}}>
+        //         <AppBar position="static">
+        //           <Tabs value={tabValue} onChange={handleTabChange} className={classes.tab} variant="fullWidth" centered style={{width: '100%'}}>
+        //             <Tab label="PELO NOME" {...a11yProps(0)} />
+        //             <Tab label="PELA DESCRIÇÃO" {...a11yProps(1)} />
+        //           </Tabs>
+        //         </AppBar>
+        //         <TabPanel value={tabValue} index={0}>
+        //           <Autocomplete
+        //             required
+        //             id="specie"
+        //             className={classes.input}
+        //             value={searchParams}
+        //             options={species}
+        //             onChange={(event, newValue) => setCurrentSpecie(newValue)}
+        //             groupBy={(option) => option.firstLetter}
+        //             getOptionLabel={(option) => {
+        //               if (typeof option === 'string') {
+        //                 return option
+        //               }
+        //               if (option.inputValue) {
+        //                 return option.inputValue
+        //               }
+        //               return option.scientificName
+        //             }}
+        //             renderInput={(params) => <TextField {...params} label="Nome da espécie" variant="outlined" />}
+        //           />
+        //           {(currentSpecie)&&
+        //             (
+        //               <Card variant="outlined" style={{maxWidth: '484px'}}>
+        //                 <CardHeader
+        //                   style={{paddingBottom: '0px'}}
+        //                   title={
+        //                     <span>
+        //                       <i>{currentSpecie.scientificName.split(' ').slice(0,2).join(' ')} </i>
+        //                       {currentSpecie.scientificName.split(' ').slice(2).join(' ')}
+        //                     </span>
+        //                   }
+        //                   subheader={currentSpecie.family.toUpperCase()}
+        //                 />
+        //                 <CardContent style={{width: '100%'}}>                          
+        //                   <Typography variant="body2" component="p" style={{textAlign: 'justify'}}>
+        //                     {currentSpecie.description}
+        //                   </Typography>
+        //                 </CardContent>
+        //                 <CardActions>
+        //                   <Button size="small" className={classes.btn} disabled>Links externos</Button>
+        //                 </CardActions>
+        //               </Card>
+        //             )
+        //           }
+        //         </TabPanel>
+        //         <TabPanel value={tabValue} index={1}>
+        //           <form item autoComplete="off" style={{width: '100%'}} onSubmit={handleFormSubmit(searchSpecieByDescription)}>
+        //             <Grid container spacing={4}>
+        //               <Grid item xs={6}>
+        //                 <Autocomplete
+        //                   required
+        //                   id="family"
+        //                   value={family}
+        //                   onChange={(event, newValue) => {
+        //                     setFamily(newValue)
+        //                     setGenus('')
+        //                     if(typeof newValue === 'undefined'||newValue === null){
+        //                       setGenres([])
+        //                     } else {
+        //                       if(typeof newValue.genus == 'undefined'||newValue.genus == null) {
+        //                         setGenres([])
+        //                       } else {
+        //                         const auxGenres = Object.entries(newValue.genus).map((gen) => gen[1])
+        //                         setGenres(auxGenres)
+        //                       }
+        //                     }
+        //                   }}
+        //                   options={families}
+        //                   groupBy={(option) => option.firstLetter}
+        //                   getOptionLabel={(option) => option.name}
+        //                   renderInput={(params) => <TextField {...params} label="Família" variant="outlined" />}
+        //                 />
+        //               </Grid>
+        //               <Grid item xs={6}>
+        //                 <Autocomplete
+        //                   required
+        //                   id="genus"
+        //                   disabled={family?false:true}
+        //                   value={genus}
+        //                   onChange={(event, newValue) => {
+        //                     setGenus(newValue)
+        //                   }}
+        //                   options={genres}
+        //                   getOptionLabel={(option) => option.name}
+        //                   renderInput={(params) => <TextField {...params} label="Gênero" variant="outlined" />}
+        //                 />
+        //               </Grid>
+        //             </Grid>
 
-                    <Typography variant="overline">Descrição da planta</Typography>
-                    <TextField
-                      required
-                      id="plantDescription"
-                      name="plantDescription"
-                      onChange={handleFormSearchChange}
-                      fullWidth
-                      multiline
-                      rows={5}                  
-                      className={classes.input}
-                      label="Descrição"
-                      variant="outlined"
-                    />
+        //             <Typography variant="overline">Descrição da planta</Typography>
+        //             <TextField
+        //               required
+        //               id="plantDescription"
+        //               name="plantDescription"
+        //               onChange={handleFormSearchChange}
+        //               fullWidth
+        //               multiline
+        //               rows={5}                  
+        //               className={classes.input}
+        //               label="Descrição"
+        //               variant="outlined"
+        //             />
 
-                    <Button type="submit" variant="contained" className={classes.btn} color="primary">
-                      Pesquisar
-                    </Button>
-                  </form>
-                </TabPanel>
-              </div>
-            ):(
-              <div>
-                <List style={{paddingTop: '0px'}}>
-                  {
-                    probableSpecies.map((specie) => {
-                      const specieName = specie.scientificName.split(' ').slice(0,2).join(' ')
-                      const specieAuthor = specie.scientificName.split(' ').slice(2).join(' ')
-                      const specieRating = Math.round(specie.rating*100)
-                      return (
-                        <div className={classes.listItemResult}>
-                          <ListItem style={{width: '100%'}}>
-                            <ListItemAvatar>
-                              <Avatar className={classes.porcentagem}>{specieRating}%</Avatar>
-                            </ListItemAvatar>
-                            <ListItemText
-                              primary={<span><font style={{fontStyle: 'italic'}}>{specieName}</font> {specieAuthor}</span>}
-                              secondary="LINKS EXTERNOS EM IMPLEMENTAÇÃO"/>
-                          </ListItem>
-                          <Divider style={{width: '100%'}}/>
-                        </div>
-                      )
-                    })
-                  }                
-                </List>
-                <Button 
-                  variant="contained"
-                  className={classes.btn}
-                  color="primary"
-                  onClick={toogleShowForm}>
-                  Continuar pesquisando
-                </Button>
-              </div>
-            )}
-          </AccordionDetails>
-        </Accordion>
-
+        //             <Button type="submit" variant="contained" className={classes.btn} color="primary">
+        //               Pesquisar
+        //             </Button>
+        //           </form>
+        //         </TabPanel>
+        //       </div>
+        //     ):(
+        //       <div>
+        //         <List style={{paddingTop: '0px'}}>
+        //           {
+        //             probableSpecies.map((specie) => {
+        //               const specieName = specie.scientificName.split(' ').slice(0,2).join(' ')
+        //               const specieAuthor = specie.scientificName.split(' ').slice(2).join(' ')
+        //               const specieRating = Math.round(specie.rating*100)
+        //               return (
+        //                 <div className={classes.listItemResult}>
+        //                   <ListItem style={{width: '100%'}}>
+        //                     <ListItemAvatar>
+        //                       <Avatar className={classes.porcentagem}>{specieRating}%</Avatar>
+        //                     </ListItemAvatar>
+        //                     <ListItemText
+        //                       primary={<span><font style={{fontStyle: 'italic'}}>{specieName}</font> {specieAuthor}</span>}
+        //                       secondary="LINKS EXTERNOS EM IMPLEMENTAÇÃO"/>
+        //                   </ListItem>
+        //                   <Divider style={{width: '100%'}}/>
+        //                 </div>
+        //               )
+        //             })
+        //           }                
+        //         </List>
+        //         <Button 
+        //           variant="contained"
+        //           className={classes.btn}
+        //           color="primary"
+        //           onClick={toogleShowForm}>
+        //           Continuar pesquisando
+        //         </Button>
+        //       </div>
+        //     )}
+        //   </AccordionDetails>
+        // </Accordion>
+}
         <Accordion expanded={expanded === 'panel2'} onChange={handlePanelChange('panel2')}>
           <AccordionSummary
             expandIcon={<ExpandMore />} aria-controls="panel1a-content" id="panel1a-header" className={classes.acordionHeader}>
@@ -418,34 +434,51 @@ export default function App() {
                 {(flagAlert.missingParams)&&(
                   <Alert variant="outlined" style={{width: '100%'}} severity="error">A família ou o gênero está faltando.</Alert>
                 )}
+                {(flagAlert.specieInDb)&&(
+                  <Alert variant="outlined" style={{width: '100%'}} severity="warning">Essa espécie já foi inclusa no banco de dados.</Alert>
+                )}
               </Grid>
               <Grid container spacing={4}>
                 <Grid item xs={6}>
                   <Autocomplete
                     className={classes.input}
                     id="family"
-                    value={family}
+                    value={currentFamily}
                     onChange={(event, newValue) => {
-                      typeof newValue != 'undefined'||newValue != null&&
-                      typeof newValue.name == 'undefined'||newValue.name == null?setFamily({name: newValue}):setFamily(newValue)
-                      if(typeof newValue.genus == 'undefined'||newValue.genus == null) {
-                        setGenres([])
-                      } else {
-                        const auxGenres = Object.entries(newValue.genus).map((gen) => gen[1])
-                        setGenres(auxGenres)
-                      }
-                      setGenus('')
+                      //typeof newValue !== 'undefined'|| newValue !== null&&
                       if(!families.includes(newValue)){
                         (genres[0]==='Banco de dados vazio')?setFamilies([newValue]):setFamilies([...families, newValue])
                         postNewFamily({
                           name: newValue
+                        })
+                        getFamilyByName(newValue, (dataFromFirebase) => {
+                          setCurrentFamily(dataFromFirebase)
+                        })
+                      } else {
+                        setCurrentFamily(newValue)
+                        getGenreByFamilyKey(newValue.key, (dataFromFirebase) => {
+                          if(typeof dataFromFirebase === 'undefined' || dataFromFirebase === null) {
+                            setGenres([])
+                            console.log('')
+                          } else {
+                            const genreList = Object.entries(dataFromFirebase).map((gen) => typeof gen[1].name !== 'undefined'&&{key: gen[0], ...gen[1]})
+                            console.log(genreList)
+                            const withFirstLetterGenresList = genreList.map((gen) => {
+                              return {
+                                ...gen,
+                                firstLetter: gen.name[0].toUpperCase()
+                              }
+                            })
+                            const sortedGenresList = withFirstLetterGenresList.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))
+                            setGenres(sortedGenresList)
+                          }
                         })
                       }
                     }}
                     filterOptions={(options, params) => {
                       const filtered = filter(options, params)
                       params.inputValue!==''&&filtered.push(params.inputValue)
-                      return filtered;
+                      return filtered
                     }}
                     options={families}
                     groupBy={(option) => option.firstLetter}
@@ -465,13 +498,17 @@ export default function App() {
                   <Autocomplete
                     className={classes.input}
                     id="genus" 
-                    value={genus}
-                    disabled={family?false:true}
+                    value={currentGenre}
+                    disabled={currentFamily?false:true}
                     onChange={(event, newValue) => {
-                      setGenus({name: newValue})
                       if(!genres.includes(newValue)){
-                        setGenres([...genres, {name: newValue}])
-                        postNewGenusByFamilyName(family.name, newValue)
+                        //setGenres([...genres, {name: newValue}])
+                        postNewGenre(currentFamily.key, newValue)     
+                        getGenreByName(newValue, (dataFromFirebase) => {
+                          setCurrentGenre(dataFromFirebase)
+                        })
+                      } else {
+                        setCurrentGenre(newValue)
                       }
                     }}
                     filterOptions={(options, params) => {              
