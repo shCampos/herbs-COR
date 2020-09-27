@@ -55,7 +55,7 @@ export async function getAllSpecies(setSpecies) {
     const familiesList = Object.entries(dataSnapshot.val()).map((fam) => fam[1])    
     familiesList.map((fam) => Object.entries(fam.genus).map((gen)=>{
     	Object.entries(gen[1].species).map((species)=>{
-    		speciesList.push(species[1])
+    		speciesList.push({...species[1], family: fam.name})
     	})
     }))
 		setSpecies(speciesList)

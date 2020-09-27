@@ -9,6 +9,10 @@ import {
   AppBar,
   Box,
   Button,
+  Card,
+  CardActions,
+  CardContent,
+  CardHeader,
   CssBaseline,
   Divider,
   FormControl,
@@ -163,6 +167,7 @@ export default function App() {
 
   const [family, setFamily] = useState('')
   const [genus, setGenus] = useState('')
+  const [currentSpecie, setCurrentSpecie] = useState(null)
   const [searchParams, setSearchParams] = useState({ })
   const [specieDescription, setSpecieDescription] = useState({ })
   const [probableSpecies, setProbableSpecies] = useState([{scientificName: 'Carregando', rating: 0}])
@@ -191,10 +196,6 @@ export default function App() {
     console.log(auxProbableSpecies)
     setProbableSpecies(auxProbableSpecies)
     setFlagAlert({searched: true})
-  }
-
-  const searchSpecieByName = async () => {
-    console.log('foi')
   }
 
   const newDescription = () => {
@@ -235,7 +236,7 @@ export default function App() {
             {
             !flagAlert.searched?(
               <Typography className={classes.heading} variant="overline">
-                Pesquisar uma espécie pela descrição
+                Pesquisar uma espécie
               </Typography>
             ):(
               <Typography className={classes.heading} variant="overline">
@@ -254,33 +255,49 @@ export default function App() {
                   </Tabs>
                 </AppBar>
                 <TabPanel value={tabValue} index={0}>
-                  <form item autoComplete="off" style={{width: '100%'}} onSubmit={handleFormSubmit(searchSpecieByName)}>
-                    <Autocomplete
-                      required
-                      id="specie"
-                      className={classes.input}
-                      value={searchParams}
-                      onChange={(event, newValue) => {
-                        console.log('MUDOU', species)
-                        setSearchParams({scientificName: newValue})
-                      }}
-                      options={species}
-                      groupBy={(option) => option.firstLetter}
-                      getOptionLabel={(option) => {
-                        if (typeof option === 'string') {
-                          return option
-                        }
-                        if (option.inputValue) {
-                          return option.inputValue
-                        }
-                        return option.scientificName
-                      }}
-                      renderInput={(params) => <TextField {...params} label="Nome da espécie" variant="outlined" />}
-                    />
-                    <Button type="submit" variant="contained" className={classes.btn} color="primary">
-                      Pesquisar
-                    </Button>
-                  </form>
+                  <Autocomplete
+                    required
+                    id="specie"
+                    className={classes.input}
+                    value={searchParams}
+                    options={species}
+                    onChange={(event, newValue) => setCurrentSpecie(newValue)}
+                    groupBy={(option) => option.firstLetter}
+                    getOptionLabel={(option) => {
+                      if (typeof option === 'string') {
+                        return option
+                      }
+                      if (option.inputValue) {
+                        return option.inputValue
+                      }
+                      return option.scientificName
+                    }}
+                    renderInput={(params) => <TextField {...params} label="Nome da espécie" variant="outlined" />}
+                  />
+                  {(currentSpecie)&&
+                    (
+                      <Card variant="outlined" style={{maxWidth: '484px'}}>
+                        <CardHeader
+                          style={{paddingBottom: '0px'}}
+                          title={
+                            <span>
+                              <i>{currentSpecie.scientificName.split(' ').slice(0,2).join(' ')} </i>
+                              {currentSpecie.scientificName.split(' ').slice(2).join(' ')}
+                            </span>
+                          }
+                          subheader={currentSpecie.family.toUpperCase()}
+                        />
+                        <CardContent style={{width: '100%'}}>                          
+                          <Typography variant="body2" component="p" style={{textAlign: 'justify'}}>
+                            {currentSpecie.description}
+                          </Typography>
+                        </CardContent>
+                        <CardActions>
+                          <Button size="small" className={classes.btn} disabled>Links externos</Button>
+                        </CardActions>
+                      </Card>
+                    )
+                  }
                 </TabPanel>
                 <TabPanel value={tabValue} index={1}>
                   <form item autoComplete="off" style={{width: '100%'}} onSubmit={handleFormSubmit(searchSpecieByDescription)}>
