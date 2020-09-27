@@ -140,7 +140,6 @@ export default function App() {
         setFamilies([])
       } else {
         const familiesList = Object.entries(dataFromFirebase).map((fam) => typeof fam[1].name !== 'undefined'&&{key: fam[0], ...fam[1]})
-        console.log(familiesList)
         const withFirstLetterFamiliesList = familiesList.map((fam) => {
           return {
             ...fam,
@@ -184,7 +183,6 @@ export default function App() {
             firstLetter: specie.scientificName[0].toUpperCase()
           }
         })
-        console.log(speciesList)
         const sortedSpeciesList = withFirstLetterSpeciesList.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))
         setSpecies(sortedSpeciesList)
       }
@@ -219,19 +217,19 @@ export default function App() {
 
   const searchSpecieByDescription = async () => {
     const auxProbableSpecies = await compareDescriptions(searchParams.plantDescription, species)
-    console.log(auxProbableSpecies)
     setProbableSpecies(auxProbableSpecies)
     setFlagAlert({searched: true})
   }
 
   const newDescription = () => {
+    let auxSpecieInDb = false
     species.map((specie) => {
       if(specieDescription.scientificName == specie.scientificName) {
+        auxSpecieInDb = true
         setFlagAlert({specieInDb: true})
       }
     })
-    if(!flagAlert.specieInDb) {
-      console.log(currentFamily.key, currentGenre.key, specieDescription)
+    if(!auxSpecieInDb) {
       postSpecieDescription(currentFamily.key, currentGenre.key, specieDescription)
       .then(() => {
         setFlagAlert({sucessSendDescription: true})
@@ -239,7 +237,6 @@ export default function App() {
         setSpecieDescription({})
       }) 
       .catch((err) => {
-        console.log(err)
         setFlagAlert({errorSendDescription: true})
         setTimeout(() => setFlagAlert({errorSendDescription: false}), 8000)
       })
