@@ -56,20 +56,10 @@ export async function postNewGenre(familyKey, newGenus) {
 }
 
 export async function getAllSpecies(setSpecies) {
-	let speciesList = []
-	await firebase.database().ref('families/')
+	await firebase.database().ref('species/')
 	.on('value', (dataSnapshot) => {
-    const familiesList = Object.entries(dataSnapshot.val()).map((fam) => fam[1])    
-    familiesList.map((fam) => {
-			Object.entries(fam.genus).map((gen)=>{
-	    	Object.entries(gen[1].species).map((species)=>{
-	    		speciesList.push({...species[1], family: fam.name})
-	    	})					
-	    })
-	    setSpecies(speciesList)
-    })
+    setSpecies(dataSnapshot.val())
   })
-  console.log(speciesList)
 }
 
 export async function getSpeciesByGenre(genreKey) {
@@ -84,26 +74,4 @@ export async function postSpecieDescription(familyKey, genreKey, newSpecie) {
 		scientificName: newSpecie.scientificName,
 		description: newSpecie.description
 	})
-}
-
-async function getFamilyKey(familyName) {
-	let familyKey;
-	await firebase.database().ref('families/')
-	.orderByChild('name')
-	.equalTo(familyName)
-	.on('value', (dataSnapshot) => {
-		familyKey = Object.keys(dataSnapshot.val())[0]
-	})
-	return familyKey
-}
-
-async function getGenusKey(familyKey, genus) {
-	let genusKey;
-	await firebase.database().ref('families/'+familyKey+'/genus')
-	.orderByChild('name')
-	.equalTo(genus)
-	.on('value', (dataSnapshot) => {
-		genusKey = Object.keys(dataSnapshot.val())[0]
-	})
-	return genusKey
 }
