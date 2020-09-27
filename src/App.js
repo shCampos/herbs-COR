@@ -39,6 +39,7 @@ import { Brightness7, ExpandMore, GitHub } from '@material-ui/icons'
 import { 
   getAllFamilies,
   getFamilyByName,
+  getFamilyByKey,
   getGenreByFamilyKey,
   getGenreByName,
   getAllSpecies,
@@ -172,21 +173,22 @@ export default function App() {
   }
   const [species, setSpecies] = useState([])
   useEffect(() => {
-    // getAllSpecies((speciesFromDb) => {
-    //   if(typeof speciesFromDb === 'undefined' || speciesFromDb === null) {
-    //     setSpecies([])
-    //   } else {
-    //     const speciesList = Object.entries(speciesFromDb).map((specie) => typeof specie[1].scientificName !== 'undefined'&&specie[1])
-    //     const withFirstLetterSpeciesList = speciesList.map((specie) => {
-    //       return {
-    //         ...specie,
-    //         firstLetter: specie.scientificName[0].toUpperCase()
-    //       }
-    //     })
-    //     const sortedSpeciesList = withFirstLetterSpeciesList.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))
-    //     setSpecies(sortedSpeciesList)
-    //   }
-    // })
+    getAllSpecies((speciesFromDb) => {
+      if(typeof speciesFromDb === 'undefined' || speciesFromDb === null) {
+        setSpecies([])
+      } else {
+        const speciesList = Object.entries(speciesFromDb).map((specie) => typeof specie[1].scientificName !== 'undefined'&&specie[1])
+        const withFirstLetterSpeciesList = speciesList.map((specie) => {
+          return {
+            ...specie,
+            firstLetter: specie.scientificName[0].toUpperCase()
+          }
+        })
+        console.log(speciesList)
+        const sortedSpeciesList = withFirstLetterSpeciesList.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))
+        setSpecies(sortedSpeciesList)
+      }
+    })
   }, [])
 
   const [currentFamily, setCurrentFamily] = useState('')
@@ -290,11 +292,18 @@ export default function App() {
                 <TabPanel value={tabValue} index={0}>
                   <Autocomplete
                     required
-                    id="specie"
+                    id="scientificName"
+                    name="scientificName"
                     className={classes.input}
                     value={searchParams}
                     options={species}
-                    onChange={(event, newValue) => setCurrentSpecie(newValue)}
+                    onChange={(event, newValue) => {
+                      setCurrentSpecie(newValue)
+                      getFamilyByKey(newValue.familyKey, (dataFromFirebase) => {
+                        const auxFamily = Object.entries(dataFromFirebase)
+                        setCurrentFamily(auxFamily[0][1])
+                      })
+                    }}
                     groupBy={(option) => option.firstLetter}
                     getOptionLabel={(option) => {
                       if (typeof option === 'string') {
@@ -307,7 +316,7 @@ export default function App() {
                     }}
                     renderInput={(params) => <TextField {...params} label="Nome da espécie" variant="outlined" />}
                   />
-                  {(currentSpecie)&&
+                  {(currentSpecie && currentFamily)&&
                     (
                       <Card variant="outlined" style={{maxWidth: '484px'}}>
                         <CardHeader
@@ -318,7 +327,7 @@ export default function App() {
                               {currentSpecie.scientificName.split(' ').slice(2).join(' ')}
                             </span>
                           }
-                          subheader={currentSpecie.family.toUpperCase()}
+                          subheader={currentFamily.name.toUpperCase()}
                         />
                         <CardContent style={{width: '100%'}}>                          
                           <Typography variant="body2" component="p" style={{textAlign: 'justify'}}>
@@ -458,7 +467,8 @@ export default function App() {
                           name: newValue
                         })
                         getFamilyByName(newValue, (dataFromFirebase) => {
-                          setCurrentFamily(dataFromFirebase)
+                          const auxFamily = Object.entries(dataFromFirebase)
+                          setCurrentFamily(auxFamily[0][1])
                         })
                       } else {
                         setCurrentFamily(newValue)
@@ -495,7 +505,8 @@ export default function App() {
                         //setGenres([...genres, {name: newValue}])
                         postNewGenre(currentFamily.key, newValue)     
                         getGenreByName(newValue, (dataFromFirebase) => {
-                          setCurrentGenre(dataFromFirebase)
+                          const auxGenre = Object.entries(dataFromFirebase)
+                          setCurrentGenre(auxGenre[0][1])
                         })
                       } else {
                         setCurrentGenre(newValue)

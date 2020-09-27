@@ -32,6 +32,15 @@ export async function getFamilyByName(familyName, setCurrentFamily) {
 	})
 }
 
+export async function getFamilyByKey(familyKey, setCurrentFamily) {
+	await firebase.database().ref('families/')
+	.orderByKey()
+	.equalTo(familyKey)
+	.on('value', (dataSnapshot) => {
+		setCurrentFamily(dataSnapshot.val())
+	})
+}
+
 export async function getGenreByFamilyKey(familyKey, setGenus) {
 	await firebase.database().ref('genres/')
 	.orderByChild('familyKey')
