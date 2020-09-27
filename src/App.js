@@ -468,7 +468,7 @@ export default function App() {
                         })
                         getFamilyByName(newValue, (dataFromFirebase) => {
                           const auxFamily = Object.entries(dataFromFirebase)
-                          setCurrentFamily(auxFamily[0][1])
+                          setCurrentFamily({key: auxFamily[0][0], ...auxFamily[0][1]})
                         })
                       } else {
                         setCurrentFamily(newValue)
@@ -506,7 +506,7 @@ export default function App() {
                         postNewGenre(currentFamily.key, newValue)     
                         getGenreByName(newValue, (dataFromFirebase) => {
                           const auxGenre = Object.entries(dataFromFirebase)
-                          setCurrentGenre(auxGenre[0][1])
+                          setCurrentGenre({key: auxGenre[0][0], ...auxGenre[0][1]})
                         })
                       } else {
                         setCurrentGenre(newValue)
