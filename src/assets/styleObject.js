@@ -30,7 +30,6 @@ export const styleObject = makeStyles((theme) => ({
     paddingLeft: '2px',
     paddingRight: '2px',
     marginBottom: '15px',
-    textTransform: 'lowercase',
     textAlign: 'center'
   },
   acordionHeader: {

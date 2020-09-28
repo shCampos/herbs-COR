@@ -259,7 +259,7 @@ export default function App() {
         Farinaccio
       </Typography>
       <Typography variant="h6" className={classes.siteDescription}>
-        Apenas um site para ajudar na identificação de espécies das Iniciações Científicas do <span style={{textTransform: 'capitalize'}}>Herbário</span><span style={{textTransform: 'uppercase'}}>-COR</span>
+        apenas um site para ajudar na identificação de espécies das Iniciações Científicas do Herbário-COR
       </Typography>
 
       <div>      
