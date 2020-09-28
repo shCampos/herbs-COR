@@ -250,16 +250,16 @@ export default function App() {
       <IconButton variant="contained" onClick={toogleDarkMode} style={{width: 'min-content', height: 'min-content'}}>
         <Brightness7/>
       </IconButton>
-      <IconButton variant="contained" href="https://github.com/shCampos/lineus" target="_blank" style={{width: 'min-content', height: 'min-content'}}>
+      <IconButton variant="contained" href="https://github.com/shCampos/farinaccio" target="_blank" style={{width: 'min-content', height: 'min-content'}}>
         <GitHub/>
       </IconButton>
     </Grid>
     <Grid container direction="column" justify="center" alignItems="center" className={classes.root}>
       <Typography variant="h2" className={classes.siteTitle}>
-        Lineus
+        Farinaccio
       </Typography>
       <Typography variant="h6" className={classes.siteDescription}>
-        Apenas um site para ajudar na identificação de plantas
+        Apenas um site para ajudar na identificação de espécies das Iniciações Científicas do <span style={{textTransform: 'capitalize'}}>Herbário</span><span style={{textTransform: 'uppercase'}}>-COR</span>
       </Typography>
 
       <div>      
@@ -279,7 +279,7 @@ export default function App() {
           </AccordionSummary>
           <AccordionDetails fullWidth className={classes.acordionBody}>
             {!flagAlert.searched?(
-              <div style={{width: '-webkit-fill-available'}}>
+              <div style={{width: '-webkit-fill-available', minWidth: '100%', maxWidth: 'fit-content'}}>
                 <AppBar position="static">
                   <Tabs value={tabValue} onChange={handleTabChange} className={classes.tab} variant="fullWidth" centered style={{width: '100%'}}>
                     <Tab label="PELO NOME" {...a11yProps(0)} />
@@ -315,7 +315,7 @@ export default function App() {
                   />
                   {(currentSpecie && currentFamily)&&
                     (
-                      <Card variant="outlined" style={{maxWidth: '484px'}}>
+                      <Card variant="outlined" style={{width: '100%'}}>
                         <CardHeader
                           style={{paddingBottom: '0px'}}
                           title={
@@ -327,12 +327,15 @@ export default function App() {
                           subheader={currentFamily.name.toUpperCase()}
                         />
                         <CardContent style={{width: '100%'}}>                          
-                          <Typography variant="body2" component="p" style={{textAlign: 'justify'}}>
+                          <Typography variant="body1" component="p" style={{textAlign: 'justify'}}>
                             {currentSpecie.description}
                           </Typography>
+                          
                         </CardContent>
                         <CardActions>
-                          <Button size="small" className={classes.btn} disabled>Links externos</Button>
+                          <Typography variant="caption" style={{textAlign: 'justify', fontWeight: 'bold'}}>
+                            {currentSpecie.reference}
+                          </Typography>
                         </CardActions>
                       </Card>
                     )
@@ -548,6 +551,18 @@ export default function App() {
                 onChange={handleFormDescriptionChange}
                 className={classes.input}
                 label="Descrição"
+                variant="outlined"
+              />
+              <TextField
+                fullWidth
+                required
+                multiline
+                rows={3}
+                id="reference"
+                name="reference"
+                onChange={handleFormDescriptionChange}
+                className={classes.input}
+                label="Referência (coloque nas normas da ABNT)"
                 variant="outlined"
               />
               <Button

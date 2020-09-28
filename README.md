@@ -1,5 +1,5 @@
-# Lineus
-Apenas um site para ajudar na identificação de plantas.
+# Farinaccio
+Apenas um site para ajudar na identificação de espécies das Iniciações Científicas do Herbário-COR.
 
 ## Como usar
 1. Acesse o site [clicando aqui](https://lineus.vercel.app/).
