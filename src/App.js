@@ -234,7 +234,6 @@ export default function App() {
       .then(() => {
         setFlagAlert({sucessSendDescription: true})
         setTimeout(() => setFlagAlert({sucessSendDescription: false}), 8000)
-        setSpecieDescription({})
       }) 
       .catch((err) => {
         setFlagAlert({errorSendDescription: true})
