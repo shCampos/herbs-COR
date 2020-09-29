@@ -22,7 +22,8 @@ export const styleObject = makeStyles((theme) => ({
     backgroundColor: theme.palette.background
   },
   siteTitle: {
-    color: theme.palette.text
+    color: theme.palette.text,
+    fontFamily: 'David Libre'
   },
   siteDescription: {
     backgroundColor: '#3eb827',
@@ -31,6 +32,9 @@ export const styleObject = makeStyles((theme) => ({
     paddingRight: '2px',
     marginBottom: '15px',
     textAlign: 'center'
+  },
+  specieCounter: {
+    marginBottom: '15px',
   },
   acordionHeader: {
     backgroundColor: theme.palette.text.secondary,

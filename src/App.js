@@ -13,6 +13,7 @@ import {
   CardActions,
   CardContent,
   CardHeader,
+  Chip,
   CssBaseline,
   Divider,
   FormControl,
@@ -260,6 +261,11 @@ export default function App() {
       <Typography variant="h6" className={classes.siteDescription}>
         apenas um site para ajudar na identificação de espécies das Iniciações Científicas do Herbário-COR
       </Typography>
+        <Chip
+          size="small"
+          label={<span>{species.length} espécies no banco de dados</span>}
+          className={classes.specieCounter}
+        /> 
 
       <div>      
         <Accordion expanded={expanded === 'panel1'} onChange={handlePanelChange('panel1')}>
