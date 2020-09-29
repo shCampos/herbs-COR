@@ -228,6 +228,7 @@ export default function App() {
       if(specieDescription.scientificName == specie.scientificName) {
         auxSpecieInDb = true
         setFlagAlert({specieInDb: true})
+        setTimeout(() => setFlagAlert({specieInDb: false}), 8000)
       }
     })
     if(!auxSpecieInDb) {
@@ -261,12 +262,11 @@ export default function App() {
       <Typography variant="h6" className={classes.siteDescription}>
         apenas um site para ajudar na identificação de espécies das Iniciações Científicas do Herbário-COR
       </Typography>
-        <Chip
-          size="small"
-          label={<span>{species.length} espécies no banco de dados</span>}
-          className={classes.specieCounter}
-        /> 
-
+      <Chip
+        size="small"
+        label={<span>{species.length} espécies no banco de dados</span>}
+        className={classes.specieCounter}
+      />
       <div>      
         <Accordion expanded={expanded === 'panel1'} onChange={handlePanelChange('panel1')}>
           <AccordionSummary expandIcon={<ExpandMore />} aria-controls="panel1a-content" id="panel1a-header" className={classes.acordionHeader}>
