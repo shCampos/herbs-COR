@@ -132,6 +132,7 @@ export default function App() {
     missingParams: false,
     searched: false,
     specieInDb: false,
+    withoutAuthor: false,
   })
 
   const [families, setFamilies] = useState([])
@@ -193,8 +194,8 @@ export default function App() {
   const [currentFamily, setCurrentFamily] = useState('')
   const [currentGenre, setCurrentGenre] = useState('')
   const [currentSpecie, setCurrentSpecie] = useState(null)
-  const [searchParams, setSearchParams] = useState({ })
-  const [specieDescription, setSpecieDescription] = useState({ })
+  const [searchParams, setSearchParams] = useState({})
+  const [specieDescription, setSpecieDescription] = useState({scientificName: ''})
   const [probableSpecies, setProbableSpecies] = useState([{scientificName: 'Carregando', rating: 0}])
 
   const handleFormSubmit = callback => event => {
@@ -206,10 +207,22 @@ export default function App() {
     auxSearchValues[event.target.name] = event.target.value
     setSearchParams(auxSearchValues)
   }
+
   const handleFormDescriptionChange = (event) => {
     const auxDescriptionValues = { ...specieDescription }
     auxDescriptionValues[event.target.name] = event.target.value
     setSpecieDescription(auxDescriptionValues)
+
+    if(/(\w+\s){2}(\w+..){1,}/.test(auxDescriptionValues.scientificName)){
+      setFlagAlert({withoutAuthor: false})
+      species.map((specie) => {
+        if(auxDescriptionValues.scientificName == specie.scientificName) {
+          setFlagAlert({specieInDb: true})
+        }
+      })
+    } else {
+      setFlagAlert({withoutAuthor: true})
+    }
   }
 
   const toogleShowForm = () => {
@@ -223,15 +236,7 @@ export default function App() {
   }
 
   const newDescription = () => {
-    let auxSpecieInDb = false
-    species.map((specie) => {
-      if(specieDescription.scientificName == specie.scientificName) {
-        auxSpecieInDb = true
-        setFlagAlert({specieInDb: true})
-        setTimeout(() => setFlagAlert({specieInDb: false}), 8000)
-      }
-    })
-    if(!auxSpecieInDb) {
+    if(!flagAlert.specieInDb && !flagAlert.withoutAuthor) {
       postSpecieDescription(currentFamily.key, currentGenre.key, specieDescription)
       .then(() => {
         setFlagAlert({sucessSendDescription: true})
@@ -446,16 +451,19 @@ export default function App() {
             <form onSubmit={handleFormSubmit(newDescription)} autoComplete="off" style={{width: '100%'}}>
               <Grid container fullWidth style={{marginBottom: '10px'}}>
                 {(flagAlert.sucessSendDescription)&&(
-                  <Alert variant="outlined" style={{width: '100%'}} severity="success">Descrição enviada ao banco de dados.</Alert>
+                  <Alert variant="filled" style={{width: '100%'}} severity="success">Descrição enviada ao banco de dados.</Alert>
                 )}
                 {(flagAlert.errorSendDescription)&&(
-                  <Alert variant="outlined" style={{width: '100%'}} severity="error">Erro em enviar descrição ao banco de dados.</Alert>
+                  <Alert variant="filled" style={{width: '100%'}} severity="error">Erro em enviar descrição ao banco de dados.</Alert>
                 )}
                 {(flagAlert.missingParams)&&(
-                  <Alert variant="outlined" style={{width: '100%'}} severity="error">A família ou o gênero está faltando.</Alert>
+                  <Alert variant="filled" style={{width: '100%'}} severity="error">A família ou o gênero está faltando.</Alert>
+                )}
+                {(flagAlert.withoutAuthor)&&(
+                  <Alert variant="filled" style={{width: '100%'}} severity="warning">Coloque o autor.</Alert>
                 )}
                 {(flagAlert.specieInDb)&&(
-                  <Alert variant="outlined" style={{width: '100%'}} severity="warning">Essa espécie já foi inclusa no banco de dados.</Alert>
+                  <Alert variant="filled" style={{width: '100%'}} severity="warning">Essa espécie já foi inclusa no banco de dados.</Alert>
                 )}
               </Grid>
               <Grid container spacing={4}>
@@ -506,7 +514,7 @@ export default function App() {
                     value={currentGenre}
                     disabled={currentFamily?false:true}
                     onChange={(event, newValue) => {
-                      if(!genres.includes(newValue)){
+                      if(!genres.includes(newValue) && typeof newValue != undefined){
                         //setGenres([...genres, {name: newValue}])
                         postNewGenre(currentFamily.key, newValue)     
                         getGenreByName(newValue, (dataFromFirebase) => {
@@ -542,6 +550,7 @@ export default function App() {
                 id="scientificName"
                 name="scientificName"
                 onChange={handleFormDescriptionChange}
+                value={specieDescription.scientificName}
                 className={classes.input}
                 label="Nome da espécie com autor"
                 variant="outlined"
@@ -553,6 +562,7 @@ export default function App() {
                 rows={10}
                 id="description"
                 name="description"
+                value={specieDescription.description}
                 onChange={handleFormDescriptionChange}
                 className={classes.input}
                 label="Descrição"
@@ -565,6 +575,7 @@ export default function App() {
                 rows={3}
                 id="reference"
                 name="reference"
+                value={specieDescription.reference}
                 onChange={handleFormDescriptionChange}
                 className={classes.input}
                 label="Referência (coloque nas normas da ABNT)"
