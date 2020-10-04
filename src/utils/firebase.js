@@ -13,18 +13,18 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig)
 
 export async function getAllFamilies(setFamilies) {
-	await firebase.database().ref('families/')
+	await firebase.database().ref('plantae/families/')
 	.on('value', (dataSnapshot) => {
     setFamilies(dataSnapshot.val())
   })
 }
 
 export async function postNewFamily(family) {
-	await firebase.database().ref('families/').push(family)
+	await firebase.database().ref('plantae/families/').push(family)
 }
 
 export async function getFamilyByName(familyName, setCurrentFamily) {
-	await firebase.database().ref('families/')
+	await firebase.database().ref('plantae/families/')
 	.orderByChild('name')
 	.equalTo(familyName)
 	.on('value', (dataSnapshot) => {
@@ -33,7 +33,7 @@ export async function getFamilyByName(familyName, setCurrentFamily) {
 }
 
 export async function getFamilyByKey(familyKey, setCurrentFamily) {
-	await firebase.database().ref('families/')
+	await firebase.database().ref('plantae/families/')
 	.orderByKey()
 	.equalTo(familyKey)
 	.on('value', (dataSnapshot) => {
@@ -42,7 +42,7 @@ export async function getFamilyByKey(familyKey, setCurrentFamily) {
 }
 
 export async function getGenreByFamilyKey(familyKey, setGenus) {
-	await firebase.database().ref('genres/')
+	await firebase.database().ref('plantae/genres/')
 	.orderByChild('familyKey')
 	.equalTo(familyKey)
 	.on('value', (dataSnapshot) => {
@@ -51,7 +51,7 @@ export async function getGenreByFamilyKey(familyKey, setGenus) {
 }
 
 export async function getGenreByName(genreName, setCurrentGenre) {
-	await firebase.database().ref('genres/')
+	await firebase.database().ref('plantae/genres/')
 	.orderByChild('name')
 	.equalTo(genreName)
 	.on('value', (dataSnapshot) => {
@@ -60,12 +60,12 @@ export async function getGenreByName(genreName, setCurrentGenre) {
 }
 
 export async function postNewGenre(familyKey, newGenus) {
-	await firebase.database().ref('genres/')
+	await firebase.database().ref('plantae/genres/')
 		.push({familyKey: familyKey, name: newGenus})
 }
 
 export async function getAllSpecies(setSpecies) {
-	await firebase.database().ref('species/')
+	await firebase.database().ref('plantae/species/')
 	.on('value', (dataSnapshot) => {
     setSpecies(dataSnapshot.val())
   })
@@ -76,7 +76,7 @@ export async function getSpeciesByGenre(genreKey) {
 }
 
 export async function postSpecieDescription(familyKey, genreKey, newSpecie) {
-	await firebase.database().ref('species/')
+	await firebase.database().ref('plantae/species/')
 	.push({
 		familyKey: familyKey,
 		genreKey: genreKey,
