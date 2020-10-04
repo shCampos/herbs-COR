@@ -2,7 +2,7 @@
 Apenas um site para ajudar na identificação de espécies das Iniciações Científicas do Herbário-COR.
 
 ## Como usar
-1. Acesse o site [clicando aqui](https://lineus.vercel.app/).
+1. Acesse o site [clicando aqui](https://farinaccio.vercel.app/).
 2. Você poderá adicionar a descrição da espécie que desejas identificar. O site retornará as espécies mais prováveis.
 > Lembrete: O sistema funciona apenas com ESPÉCIES CONHECIDAS E PREVIAMENTE CADASTRADAS NO BANCO DE DADOS.
 > Outro lembrete: NÃO CONFIE 100% NO QUE O SITE DISSER. O poste é mais uma bengala para o bêbado do que uma fonte de luz. Você é o bêbado e esse sistema é o poste.
