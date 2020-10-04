@@ -10,7 +10,7 @@ Apenas um site para ajudar na identificação de espécies das Iniciações Cien
 > Isso irá ajudar o banco de dados expandir.
 
 ## Como posso contribuir?
-- Adicione descrição de plantas que você encontrar nos artigos. A descrição pode ser tanto completa quanto sinopse.
+- Adicione descrição de plantas que você encontrar nos artigos. A descrição precisa ser completa.
 - Pull requests são muito bem-vindos também :).
 
 ## Equipe
