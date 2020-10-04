@@ -9,7 +9,7 @@ export async function compareDescriptions(userDescription, allSpecies) {
 	console.log(allSpecies, probableSpecies)
 
 	let probableSpeciesComplete = []
-	let i = 0;
+	let i = 0
 	probableSpecies.ratings.forEach((pSpecie) => {
 		allSpecies.forEach((specie) => {			
 			if(pSpecie.target==specie.description && i < 10) {
