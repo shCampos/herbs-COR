@@ -118,23 +118,14 @@ export default function App() {
   }, [])
   const classes = styleObject()
 
-  const [queryType, setQueryType] = useState('')
   const [expanded, setExpanded] = useState(false)
-  const handleChangeQuerySelect = (event) => {
-    setQueryType(event.target.value)
-    console.log(expanded)
-    if(event.target.value.includes('search')) {
-      setExpanded('panel1')
-    } else {
-      setExpanded('panel2')
-    }
+  const handlePanelChange = (panel) => (event, isExpanded) => {
+    setExpanded(isExpanded ? panel : false)
   }
-
   const [tabValue, setTabValue] = useState(0)
   const handleTabChange = (event, newValue) => {
-    setTabValue(newValue)
-  }
-
+    setTabValue(newValue);
+  };
   const [flagAlert, setFlagAlert] = useState({
     sucessSendDescription:false,
     errorSendDescription: false,
@@ -142,7 +133,6 @@ export default function App() {
     searched: false,
     specieInDb: false,
     withoutAuthor: false,
-    newGenre: false,
   })
 
   const [families, setFamilies] = useState([])
@@ -167,7 +157,6 @@ export default function App() {
   const getGenreList = (familyKey) => {
     getGenreByFamilyKey(familyKey, (dataFromFirebase) => {
       setCurrentGenre({})
-      console.log(dataFromFirebase)
       if(typeof dataFromFirebase === 'undefined' || dataFromFirebase === null) {
         setGenres([])
       } else {
@@ -204,10 +193,9 @@ export default function App() {
 
   const [currentFamily, setCurrentFamily] = useState('')
   const [currentGenre, setCurrentGenre] = useState('')
-  const [possibleGenre, setPossibleGenre] = useState('')
   const [currentSpecie, setCurrentSpecie] = useState(null)
   const [searchParams, setSearchParams] = useState({})
-  const [newItemDescription, setNewItemDescription] = useState({scientificName: ''})
+  const [specieDescription, setSpecieDescription] = useState({scientificName: ''})
   const [probableSpecies, setProbableSpecies] = useState([{scientificName: 'Carregando', rating: 0}])
 
   const handleFormSubmit = callback => event => {
@@ -221,40 +209,20 @@ export default function App() {
   }
 
   const handleFormDescriptionChange = (event) => {
-    const auxDescriptionValues = { ...newItemDescription }
+    const auxDescriptionValues = { ...specieDescription }
     auxDescriptionValues[event.target.name] = event.target.value
-    setNewItemDescription(auxDescriptionValues)
+    setSpecieDescription(auxDescriptionValues)
 
-    const scientificNameSplited = auxDescriptionValues.itemName.split(" ")
-    setFlagAlert({'newGenre': false})
-
-    const validateSpecieName = () => {
-      if(/([A-Z])\w+\s/.test(auxDescriptionValues.itemName)) {
-        let isGenreInDb = genres.some((g) => g.name == scientificNameSplited[0]?true:false)
-        if(isGenreInDb) { 
-          const genreAux = genres.filter(g => g.name == scientificNameSplited[0])
-          setCurrentGenre(genreAux[0])
-          setFlagAlert({'newGenre': false})
-
-          if(/(\w+\s){2}((\d||.)\w){1,}/.test(auxDescriptionValues.itemName)){
-            setFlagAlert({withoutAuthor: false})
-            species.map((specie) => {
-              if(auxDescriptionValues.itemName == specie.itemName) {
-                setFlagAlert({specieInDb: true})
-              }
-            })
-          } else {
-            setFlagAlert({withoutAuthor: true})
-          }
-        } else {
-          console.log('scientificNameSplited', scientificNameSplited)
-          setPossibleGenre(scientificNameSplited[0])
-          setFlagAlert({'newGenre': true})
+    if(/(\w+\s){2}(\w+..){1,}/.test(auxDescriptionValues.scientificName)){
+      setFlagAlert({withoutAuthor: false})
+      species.map((specie) => {
+        if(auxDescriptionValues.scientificName == specie.scientificName) {
+          setFlagAlert({specieInDb: true})
         }
-      }
+      })
+    } else {
+      setFlagAlert({withoutAuthor: true})
     }
-
-    (queryType=='createSpecie')&&validateSpecieName()
   }
 
   const toogleShowForm = () => {
@@ -267,21 +235,17 @@ export default function App() {
     setFlagAlert({searched: true})
   }
 
-  const sendNewItemDescription = () => {
-    if(!flagAlert.specieInDb && !flagAlert.withoutAuthor && !flagAlert.newGenre) {
-      if(queryType == 'createSpecie') {
-        console.log(currentGenre)
-        postSpecieDescription(currentFamily.key, currentGenre.key, newItemDescription)
-        .then(() => {
-          setFlagAlert({sucessSendDescription: true})
-          setTimeout(() => setFlagAlert({sucessSendDescription: false}), 8000)
-        }) 
-        .catch((err) => {
-          console.log(err)
-          setFlagAlert({errorSendDescription: true})
-          setTimeout(() => setFlagAlert({errorSendDescription: false}), 8000)
-        })
-      }
+  const newDescription = () => {
+    if(!flagAlert.specieInDb && !flagAlert.withoutAuthor) {
+      postSpecieDescription(currentFamily.key, currentGenre.key, specieDescription)
+      .then(() => {
+        setFlagAlert({sucessSendDescription: true})
+        setTimeout(() => setFlagAlert({sucessSendDescription: false}), 8000)
+      }) 
+      .catch((err) => {
+        setFlagAlert({errorSendDescription: true})
+        setTimeout(() => setFlagAlert({errorSendDescription: false}), 8000)
+      })
     }
   }  
 
@@ -309,28 +273,13 @@ export default function App() {
         className={classes.specieCounter}
       />
       <div>      
-        <Accordion expanded={expanded === 'panel1'}>
+        <Accordion expanded={expanded === 'panel1'} onChange={handlePanelChange('panel1')}>
           <AccordionSummary expandIcon={<ExpandMore />} aria-controls="panel1a-content" id="panel1a-header" className={classes.acordionHeader}>
             {
             !flagAlert.searched?(
-              <div style={{width: '100%'}}>
-                <Typography className={classes.heading} variant="overline">
-                  Pesquisar
-                </Typography>
-                <Select
-                variant="outlined"
-                  style={{marginLeft: '5px', width: 'fit-content', color: '#fff', backgroundColor: 'transparent'}}
-                  id="selectQuery"
-                  value={queryType}
-                  onChange={handleChangeQuerySelect}
-                  className={classes.input}
-                  label="O que você quer pesquisar?"
-                >
-                  <MenuItem value={'searchGenre'}>GÊNERO</MenuItem>
-                  <MenuItem value={'searchSpecie'}>ESPÉCIE</MenuItem>
-                  <MenuItem value={'searchReference'}>REFERÊNCIA</MenuItem>
-                </Select>
-              </div>
+              <Typography className={classes.heading} variant="overline">
+                Pesquisar uma espécie
+              </Typography>
             ):(
               <Typography className={classes.heading} variant="overline">
                 Possíveis resultados
@@ -339,295 +288,308 @@ export default function App() {
             }
           </AccordionSummary>
           <AccordionDetails fullWidth className={classes.acordionBody}>
-            {
-              (queryType == 'searchSpecie' || queryType == 'searchGenre')&&(
-                !flagAlert.searched?(
-                  <div style={{width: '-webkit-fill-available', minWidth: '100%', maxWidth: 'fit-content'}}>
-                    <AppBar position="static">
-                      <Tabs value={tabValue} onChange={handleTabChange} className={classes.tab} variant="fullWidth" centered style={{width: '100%'}}>
-                        <Tab label="PELO NOME" {...a11yProps(0)} />
-                        <Tab label="PELA DESCRIÇÃO" {...a11yProps(1)} />
-                      </Tabs>
-                    </AppBar>
-                    <TabPanel value={tabValue} index={0}>
-                      <Autocomplete
-                        required
-                        id="scientificName"
-                        name="scientificName"
-                        className={classes.input}
-                        value={searchParams}
-                        options={species}
-                        onChange={(event, newValue) => {
-                          setCurrentSpecie(newValue)
-                          getFamilyByKey(newValue.familyKey, (dataFromFirebase) => {
-                            const auxFamily = Object.entries(dataFromFirebase)
-                            setCurrentFamily(auxFamily[0][1])
-                          })
-                        }}
-                        groupBy={(option) => option.firstLetter}
-                        getOptionLabel={(option) => {
-                          if (typeof option === 'string') {
-                            return option
-                          }
-                          if (option.inputValue) {
-                            return option.inputValue
-                          }
-                          return option.scientificName
-                        }}
-                        renderInput={(params) => <TextField {...params} label="Nome" variant="outlined" />}
-                      />
-                      {(currentSpecie && currentFamily)&&
-                        (
-                          <Card variant="outlined" style={{width: '100%'}}>
-                            <CardHeader
-                              style={{paddingBottom: '0px'}}
-                              title={
-                                <span>
-                                  <i>{currentSpecie.scientificName.split(' ').slice(0,2).join(' ')} </i>
-                                  {currentSpecie.scientificName.split(' ').slice(2).join(' ')}
-                                </span>
-                              }
-                              subheader={currentFamily.name.toUpperCase()}
-                            />
-                            <CardContent style={{width: '100%'}}>                          
-                              <Typography variant="body1" component="p" style={{textAlign: 'justify'}}>
-                                {currentSpecie.description}
-                              </Typography>
-                              
-                            </CardContent>
-                            <CardActions>
-                              <Typography variant="caption" style={{textAlign: 'justify', fontWeight: 'bold'}}>
-                                {currentSpecie.reference}
-                              </Typography>
-                            </CardActions>
-                          </Card>
-                        )
+            {!flagAlert.searched?(
+              <div style={{width: '-webkit-fill-available', minWidth: '100%', maxWidth: 'fit-content'}}>
+                <AppBar position="static">
+                  <Tabs value={tabValue} onChange={handleTabChange} className={classes.tab} variant="fullWidth" centered style={{width: '100%'}}>
+                    <Tab label="PELO NOME" {...a11yProps(0)} />
+                    <Tab label="PELA DESCRIÇÃO" {...a11yProps(1)} />
+                  </Tabs>
+                </AppBar>
+                <TabPanel value={tabValue} index={0}>
+                  <Autocomplete
+                    required
+                    id="scientificName"
+                    name="scientificName"
+                    className={classes.input}
+                    value={searchParams}
+                    options={species}
+                    onChange={(event, newValue) => {
+                      setCurrentSpecie(newValue)
+                      getFamilyByKey(newValue.familyKey, (dataFromFirebase) => {
+                        const auxFamily = Object.entries(dataFromFirebase)
+                        setCurrentFamily(auxFamily[0][1])
+                      })
+                    }}
+                    groupBy={(option) => option.firstLetter}
+                    getOptionLabel={(option) => {
+                      if (typeof option === 'string') {
+                        return option
                       }
-                    </TabPanel>
-                    <TabPanel value={tabValue} index={1}>
-                      <form item autoComplete="off" style={{width: '100%'}} onSubmit={handleFormSubmit(searchSpecieByDescription)}>
-                        <Grid container spacing={4}>
-                          <Grid item xs={12}>
-                            <Autocomplete
-                              required
-                              id="family"
-                              value={currentFamily}
-                              onChange={(event, newValue) => {
-                                setCurrentFamily(newValue)
-                                getGenreList(newValue.key)
-                              }}
-                              options={families}
-                              groupBy={(option) => option.firstLetter}
-                              getOptionLabel={(option) => option.name}
-                              renderInput={(params) => <TextField {...params} label="Família" variant="outlined" />}
-                            />
-                          </Grid>
-                        </Grid>
-
-                        <Typography variant="overline">Descrição</Typography>
-                        <TextField
-                          required
-                          id="plantDescription"
-                          name="plantDescription"
-                          onChange={handleFormSearchChange}
-                          fullWidth
-                          multiline
-                          rows={5}                  
-                          className={classes.input}
-                          label="Descrição"
-                          variant="outlined"
+                      if (option.inputValue) {
+                        return option.inputValue
+                      }
+                      return option.scientificName
+                    }}
+                    renderInput={(params) => <TextField {...params} label="Nome da espécie" variant="outlined" />}
+                  />
+                  {(currentSpecie && currentFamily)&&
+                    (
+                      <Card variant="outlined" style={{width: '100%'}}>
+                        <CardHeader
+                          style={{paddingBottom: '0px'}}
+                          title={
+                            <span>
+                              <i>{currentSpecie.scientificName.split(' ').slice(0,2).join(' ')} </i>
+                              {currentSpecie.scientificName.split(' ').slice(2).join(' ')}
+                            </span>
+                          }
+                          subheader={currentFamily.name.toUpperCase()}
                         />
+                        <CardContent style={{width: '100%'}}>                          
+                          <Typography variant="body1" component="p" style={{textAlign: 'justify'}}>
+                            {currentSpecie.description}
+                          </Typography>
+                          
+                        </CardContent>
+                        <CardActions>
+                          <Typography variant="caption" style={{textAlign: 'justify', fontWeight: 'bold'}}>
+                            {currentSpecie.reference}
+                          </Typography>
+                        </CardActions>
+                      </Card>
+                    )
+                  }
+                </TabPanel>
+                <TabPanel value={tabValue} index={1}>
+                  <form item autoComplete="off" style={{width: '100%'}} onSubmit={handleFormSubmit(searchSpecieByDescription)}>
+                    <Grid container spacing={4}>
+                      <Grid item xs={6}>
+                        <Autocomplete
+                          required
+                          id="family"
+                          value={currentFamily}
+                          onChange={(event, newValue) => {
+                            setCurrentFamily(newValue)
+                            getGenreList(newValue.key)
+                          }}
+                          options={families}
+                          groupBy={(option) => option.firstLetter}
+                          getOptionLabel={(option) => option.name}
+                          renderInput={(params) => <TextField {...params} label="Família" variant="outlined" />}
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Autocomplete
+                          required
+                          id="genus"
+                          disabled={currentFamily?false:true}
+                          value={currentGenre}
+                          onChange={(event, newValue) => {
+                            setCurrentGenre(newValue)
+                          }}
+                          options={genres}
+                          getOptionLabel={(option) => option.name}
+                          renderInput={(params) => <TextField {...params} label="Gênero" variant="outlined" />}
+                        />
+                      </Grid>
+                    </Grid>
 
-                        <Button type="submit" variant="contained" className={classes.btn} color="primary">
-                          Pesquisar
-                        </Button>
-                      </form>
-                    </TabPanel>
-                  </div>
-                ):(
-                  <div>
-                    <List style={{paddingTop: '0px'}}>
-                      {
-                        probableSpecies.map((specie) => {
-                          const specieName = specie.scientificName.split(' ').slice(0,2).join(' ')
-                          const specieAuthor = specie.scientificName.split(' ').slice(2).join(' ')
-                          const specieRating = Math.round(specie.rating*100)
-                          return (
-                            <div className={classes.listItemResult}>
-                              <ListItem style={{width: '100%'}}>
-                                <ListItemAvatar>
-                                  <Avatar className={classes.porcentagem}>{specieRating}%</Avatar>
-                                </ListItemAvatar>
-                                <ListItemText
-                                  primary={<span><font style={{fontStyle: 'italic'}}>{specieName}</font> {specieAuthor}</span>}
-                                  secondary="LINKS EXTERNOS EM IMPLEMENTAÇÃO"/>
-                              </ListItem>
-                              <Divider style={{width: '100%'}}/>
-                            </div>
-                          )
-                        })
-                      }                
-                    </List>
-                    <Button 
-                      variant="contained"
-                      className={classes.btn}
-                      color="primary"
-                      onClick={toogleShowForm}>
-                      Continuar pesquisando
-                    </Button>
-                  </div>
-                )
-              )
-            }
-          </AccordionDetails>
-        </Accordion>
-        <Accordion expanded={expanded === 'panel2'}>
-          <AccordionSummary
-            expandIcon={<ExpandMore />} aria-controls="panel1a-content" id="panel1a-header" className={classes.acordionHeader}>
-            <div style={{width: '100%'}}>
-              <Typography className={classes.heading} variant="overline">
-                Adicionar um(a)
-              </Typography>
-              <Select
-              variant="outlined"
-                style={{marginLeft: '5px', width: 'fit-content', color: '#fff', backgroundColor: 'transparent'}}
-                id="selectQuery"
-                value={queryType}
-                onChange={handleChangeQuerySelect}
-                className={classes.input}
-                label="O que você quer pesquisar?"
-              >
-                <MenuItem value={'createGenre'}>GÊNERO</MenuItem>
-                <MenuItem value={'createSpecie'}>ESPÉCIE</MenuItem>
-              </Select>
-            </div>
-          </AccordionSummary>
-          <AccordionDetails className={classes.acordionBody}>
-              <form onSubmit={handleFormSubmit(sendNewItemDescription)} autoComplete="off" style={{width: '100%'}}>
-                <Grid container fullWidth style={{marginBottom: '10px'}}>
-                  {(flagAlert.sucessSendDescription)&&(
-                    <Alert variant="filled" style={{width: '100%'}} severity="success">Descrição enviada ao banco de dados.</Alert>
-                  )}
-                  {(flagAlert.errorSendDescription)&&(
-                    <Alert variant="filled" style={{width: '100%'}} severity="error">Erro em enviar descrição ao banco de dados.</Alert>
-                  )}
-                  {(flagAlert.missingParams)&&(
-                    <Alert variant="filled" style={{width: '100%'}} severity="error">A família ou o gênero está faltando.</Alert>
-                  )}
-                  {(flagAlert.newGenre)&&(
-                    <Alert variant="filled" style={{width: '100%'}} severity="warning"
-                      action={<Button color="inherit" size="small" onClick={()=>{
-                        postNewGenre(currentFamily.key, possibleGenre)
-                        getGenreByName(possibleGenre, (dataFromFirebase) => {
-                          const auxGenre = Object.entries(dataFromFirebase)
-                          console.log(auxGenre)
-                          setCurrentGenre({key: auxGenre[0][0], ...auxGenre[0][1]})
-                          setGenres([...genres, {key: auxGenre[0][0], ...auxGenre[0][1]}])
-                        })
-                        setFlagAlert({newGenre: false})
-                      }}>CADASTRAR</Button>}>
-                      Gênero não encontrado. Deseja adicioná-lo no banco de dados?
-                    </Alert>
-                  )}
-                  {(flagAlert.withoutAuthor)&&(
-                    <Alert variant="filled" style={{width: '100%'}} severity="warning">Coloque o autor.</Alert>
-                  )}
-                  {(flagAlert.specieInDb)&&(
-                    <Alert variant="filled" style={{width: '100%'}} severity="warning">Essa espécie já foi inclusa no banco de dados.</Alert>
-                  )}
-                </Grid>
-                <Grid container spacing={4}>
-                  <Grid item xs={6}>
-                    <Autocomplete
-                      className={classes.input}
-                      id="family"
-                      value={currentFamily}
-                      onChange={(event, newValue) => {
-                        //typeof newValue !== 'undefined'|| newValue !== null&&
-                        if(!families.includes(newValue)){
-                          (genres[0]==='Banco de dados vazio')?setFamilies([newValue]):setFamilies([...families, newValue])
-                          postNewFamily({
-                            name: newValue
-                          })
-                          getFamilyByName(newValue, (dataFromFirebase) => {
-                            const auxFamily = Object.entries(dataFromFirebase)
-                            setCurrentFamily({key: auxFamily[0][0], ...auxFamily[0][1]})
-                          })
-                        } else {
-                          setCurrentFamily(newValue)
-                          getGenreList(newValue.key)
-                        }
-                      }}
-                      filterOptions={(options, params) => {
-                        const filtered = filter(options, params)
-                        params.inputValue!==''&&filtered.push(params.inputValue)
-                        return filtered
-                      }}
-                      options={families}
-                      groupBy={(option) => option.firstLetter}
-                      getOptionLabel={(option) => {
-                        if (typeof option === 'string') {
-                          return option
-                        }
-                        if (option.inputValue) {
-                          return option.inputValue
-                        }
-                        return option.name
-                      }}
-                      renderInput={(params) => <TextField {...params} label="Família" variant="outlined" />}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
+                    <Typography variant="overline">Descrição da planta</Typography>
                     <TextField
-                      fullWidth
                       required
-                      disabled={currentFamily?false:true}
-                      id="itemName"
-                      name="itemName"
-                      onChange={handleFormDescriptionChange}
-                      value={newItemDescription.itemName}
+                      id="plantDescription"
+                      name="plantDescription"
+                      onChange={handleFormSearchChange}
+                      fullWidth
+                      multiline
+                      rows={5}                  
                       className={classes.input}
-                      label={queryType == 'createSpecie'?"Nome da espécie com autor":"Nome do gênero com autor"}
+                      label="Descrição"
                       variant="outlined"
                     />
-                  </Grid>
-                </Grid>
-                
-                <TextField
-                  fullWidth
-                  required
-                  multiline
-                  rows={10}
-                  id="itemDescription"
-                  name="itemDescription"
-                  value={newItemDescription.description}
-                  onChange={handleFormDescriptionChange}
-                  className={classes.input}
-                  label="Descrição"
-                  variant="outlined"
-                />
-                <TextField
-                  fullWidth
-                  required
-                  multiline
-                  rows={3}
-                  id="itemReference"
-                  name="itemReference"
-                  value={newItemDescription.reference}
-                  onChange={handleFormDescriptionChange}
-                  className={classes.input}
-                  label="Referência (coloque nas normas da ABNT)"
-                  variant="outlined"
-                />
-                <Button
-                  type="submit"
+
+                    <Button type="submit" variant="contained" className={classes.btn} color="primary">
+                      Pesquisar
+                    </Button>
+                  </form>
+                </TabPanel>
+              </div>
+            ):(
+              <div>
+                <List style={{paddingTop: '0px'}}>
+                  {
+                    probableSpecies.map((specie) => {
+                      const specieName = specie.scientificName.split(' ').slice(0,2).join(' ')
+                      const specieAuthor = specie.scientificName.split(' ').slice(2).join(' ')
+                      const specieRating = Math.round(specie.rating*100)
+                      return (
+                        <div className={classes.listItemResult}>
+                          <ListItem style={{width: '100%'}}>
+                            <ListItemAvatar>
+                              <Avatar className={classes.porcentagem}>{specieRating}%</Avatar>
+                            </ListItemAvatar>
+                            <ListItemText
+                              primary={<span><font style={{fontStyle: 'italic'}}>{specieName}</font> {specieAuthor}</span>}
+                              secondary="LINKS EXTERNOS EM IMPLEMENTAÇÃO"/>
+                          </ListItem>
+                          <Divider style={{width: '100%'}}/>
+                        </div>
+                      )
+                    })
+                  }                
+                </List>
+                <Button 
                   variant="contained"
                   className={classes.btn}
-                  color="primary"                
-                >
-                  Enviar
+                  color="primary"
+                  onClick={toogleShowForm}>
+                  Continuar pesquisando
                 </Button>
-              </form>
+              </div>
+            )}
+          </AccordionDetails>
+        </Accordion>
+        <Accordion expanded={expanded === 'panel2'} onChange={handlePanelChange('panel2')}>
+          <AccordionSummary
+            expandIcon={<ExpandMore />} aria-controls="panel1a-content" id="panel1a-header" className={classes.acordionHeader}>
+            <Typography className={classes.heading} variant="overline">
+              Adicionar uma espécie
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails className={classes.acordionBody}>
+            <form onSubmit={handleFormSubmit(newDescription)} autoComplete="off" style={{width: '100%'}}>
+              <Grid container fullWidth style={{marginBottom: '10px'}}>
+                {(flagAlert.sucessSendDescription)&&(
+                  <Alert variant="filled" style={{width: '100%'}} severity="success">Descrição enviada ao banco de dados.</Alert>
+                )}
+                {(flagAlert.errorSendDescription)&&(
+                  <Alert variant="filled" style={{width: '100%'}} severity="error">Erro em enviar descrição ao banco de dados.</Alert>
+                )}
+                {(flagAlert.missingParams)&&(
+                  <Alert variant="filled" style={{width: '100%'}} severity="error">A família ou o gênero está faltando.</Alert>
+                )}
+                {(flagAlert.withoutAuthor)&&(
+                  <Alert variant="filled" style={{width: '100%'}} severity="warning">Coloque o autor.</Alert>
+                )}
+                {(flagAlert.specieInDb)&&(
+                  <Alert variant="filled" style={{width: '100%'}} severity="warning">Essa espécie já foi inclusa no banco de dados.</Alert>
+                )}
+              </Grid>
+              <Grid container spacing={4}>
+                <Grid item xs={6}>
+                  <Autocomplete
+                    className={classes.input}
+                    id="family"
+                    value={currentFamily}
+                    onChange={(event, newValue) => {
+                      //typeof newValue !== 'undefined'|| newValue !== null&&
+                      if(!families.includes(newValue)){
+                        (genres[0]==='Banco de dados vazio')?setFamilies([newValue]):setFamilies([...families, newValue])
+                        postNewFamily({
+                          name: newValue
+                        })
+                        getFamilyByName(newValue, (dataFromFirebase) => {
+                          const auxFamily = Object.entries(dataFromFirebase)
+                          setCurrentFamily({key: auxFamily[0][0], ...auxFamily[0][1]})
+                        })
+                      } else {
+                        setCurrentFamily(newValue)
+                        getGenreList(newValue.key)
+                      }
+                    }}
+                    filterOptions={(options, params) => {
+                      const filtered = filter(options, params)
+                      params.inputValue!==''&&filtered.push(params.inputValue)
+                      return filtered
+                    }}
+                    options={families}
+                    groupBy={(option) => option.firstLetter}
+                    getOptionLabel={(option) => {
+                      if (typeof option === 'string') {
+                        return option
+                      }
+                      if (option.inputValue) {
+                        return option.inputValue
+                      }
+                      return option.name
+                    }}
+                    renderInput={(params) => <TextField {...params} label="Família" variant="outlined" />}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <Autocomplete
+                    className={classes.input}
+                    id="genus" 
+                    value={currentGenre}
+                    disabled={currentFamily?false:true}
+                    onChange={(event, newValue) => {
+                      if(!genres.includes(newValue) && typeof newValue != undefined){
+                        //setGenres([...genres, {name: newValue}])
+                        postNewGenre(currentFamily.key, newValue)     
+                        getGenreByName(newValue, (dataFromFirebase) => {
+                          const auxGenre = Object.entries(dataFromFirebase)
+                          setCurrentGenre({key: auxGenre[0][0], ...auxGenre[0][1]})
+                        })
+                      } else {
+                        setCurrentGenre(newValue)
+                      }
+                    }}
+                    filterOptions={(options, params) => {              
+                      const filtered = filter(options, params)
+                      params.inputValue!==''&&filtered.push(params.inputValue)
+                      return filtered
+                    }}
+                    options={genres}
+                    getOptionLabel={(option) => {
+                      if(typeof option === 'string') {
+                        return option
+                      }
+                      if (option.inputValue) {
+                        return option.inputValue
+                      }
+                      return option.name
+                    }}
+                    renderInput={(params) => <TextField {...params} label="Gênero" variant="outlined" />}
+                  />
+                </Grid>
+              </Grid>
+              <TextField
+                fullWidth
+                required
+                id="scientificName"
+                name="scientificName"
+                onChange={handleFormDescriptionChange}
+                value={specieDescription.scientificName}
+                className={classes.input}
+                label="Nome da espécie com autor"
+                variant="outlined"
+              />
+              <TextField
+                fullWidth
+                required
+                multiline
+                rows={10}
+                id="description"
+                name="description"
+                value={specieDescription.description}
+                onChange={handleFormDescriptionChange}
+                className={classes.input}
+                label="Descrição"
+                variant="outlined"
+              />
+              <TextField
+                fullWidth
+                required
+                multiline
+                rows={3}
+                id="reference"
+                name="reference"
+                value={specieDescription.reference}
+                onChange={handleFormDescriptionChange}
+                className={classes.input}
+                label="Referência (coloque nas normas da ABNT)"
+                variant="outlined"
+              />
+              <Button
+                type="submit"
+                variant="contained"
+                className={classes.btn}
+                color="primary"                
+              >
+                Enviar
+              </Button>
+            </form>
           </AccordionDetails>
         </Accordion>
       </div>
