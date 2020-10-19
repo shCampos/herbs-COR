@@ -213,7 +213,7 @@ export default function App() {
     auxDescriptionValues[event.target.name] = event.target.value
     setSpecieDescription(auxDescriptionValues)
 
-    if(/(\w+\s){2}(\w+..){1,}/.test(auxDescriptionValues.scientificName)){
+    if(/(\w+\s){2}.{1,}/.test(auxDescriptionValues.scientificName)){
       setFlagAlert({withoutAuthor: false})
       species.map((specie) => {
         if(auxDescriptionValues.scientificName == specie.scientificName) {
