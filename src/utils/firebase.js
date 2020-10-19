@@ -80,6 +80,6 @@ export async function postSpecieDescription(familyKey, genreKey, newSpecie) {
 	.push({
 		familyKey: familyKey,
 		genreKey: genreKey,
-		..newSpecie
+		...newSpecie
 	})
 }
