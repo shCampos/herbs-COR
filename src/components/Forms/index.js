@@ -10,7 +10,7 @@ import ByNameForm from './ByNameForm.js'
 
 const filter = createFilterOptions()
 
-export default function SearchForm(props) {
+export function SearchForm(props) {
   return (
     <div>
       {(props.queryType == 'name')?(
@@ -18,6 +18,14 @@ export default function SearchForm(props) {
       ):(
         <ByDescriptionForm queryItem={props.queryItem}/>
       )}
+    </div>
+  )
+}
+
+export function AddForm(props) {
+  return (
+    <div>
+      add {props.queryType}
     </div>
   )
 }

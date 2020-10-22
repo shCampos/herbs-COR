@@ -13,6 +13,7 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  Switch,
   ThemeProvider,
   Typography } from '@material-ui/core'
 import { Alert, AlertTitle } from '@material-ui/lab'
@@ -21,7 +22,7 @@ import { Brightness7, ExpandMore, GitHub } from '@material-ui/icons'
 import { themeObject } from './assets/themeObject.js'
 import { styleObject } from './assets/styleObject.js'
 
-import SearchForm from './components/SearchForm'
+import { SearchForm, AddForm } from './components/Forms'
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -99,6 +100,11 @@ export default function App() {
     setQueryItem(event.target.value)
   }
 
+  const [postOrGetSwitch, setPostOrGetSwitch] = useState(false)
+  const handlePostOrGetSwitchChange = (event) => {
+    setPostOrGetSwitch(!postOrGetSwitch)
+  }
+
   return (
     <ThemeProvider theme={themeConfig}>
     <CssBaseline/>
@@ -121,33 +127,52 @@ export default function App() {
         <Accordion expanded={expanded === 'panel1'} onChange={handlePanelChange('panel1')}>
           <AccordionSummary expandIcon={<ExpandMore />} aria-controls="panel1a-content" id="panel1a-header" className={classes.acordionHeader}>
             <Typography className={classes.heading} variant="overline">
-              Pesquisar
+              Ações rápidas
             </Typography>
           </AccordionSummary>
           <AccordionDetails fullWidth className={classes.acordionBody}>
-            <Grid container direction="column" justify="flex-start">
-              <Grid item>
-                <FormControl variant="outlined" className={classes.formControl} fullWidth>
-                  <InputLabel id="queryItemSelectLabel">O que você quer pesquisar?</InputLabel>
-                  <Select labelId="queryItemSelectLabel" id="queryItemSelect" value={queryItem}
-                    onChange={handleChangeQueryItemSelect} label="Como você quer pesquisar?" >
-                    <MenuItem value={'specie'} selected>Espécie</MenuItem>
-                    <MenuItem value={'genre'}>Gênero</MenuItem>
-                  </Select>
-                </FormControl>
+            <Grid container direction="column">
+              <Grid container direction="row" justify="center" alignItems="center" spacing={2}>
+                <Grid item>
+                  <Typography component="div">
+                    <Grid component="label" container alignItems="center" spacing={1}>
+                      <Grid item>Pesquisar</Grid>
+                      <Grid item>
+                        <Switch onChange={handlePostOrGetSwitchChange} name="postOrGetSwitch" />
+                      </Grid>
+                      <Grid item>Adicionar</Grid>
+                    </Grid>
+                  </Typography>
+                </Grid>
+                <Grid item>
+                  <FormControl variant="outlined" className={classes.formControl} fullWidth>
+                    <InputLabel id="queryItemSelectLabel">O que você quer {(postOrGetSwitch)?'adicionar':'pesquisar'}?</InputLabel>
+                    <Select labelId="queryItemSelectLabel" id="queryItemSelect" value={queryItem}
+                      onChange={handleChangeQueryItemSelect} className={classes.input}>
+                      <MenuItem value={'specie'} selected>Espécie</MenuItem>
+                      <MenuItem value={'genre'}>Gênero</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+                {(!postOrGetSwitch)&&(
+                  <Grid item>                  
+                    <FormControl variant="outlined" className={classes.formControl} fullWidth>
+                      <InputLabel id="queryTypeSelectLabel">Como você quer pesquisar?</InputLabel>
+                      <Select labelId="queryTypeSelectLabel" id="queryTypeSelect" value={queryType}
+                        onChange={handleChangeQueryTypeSelect} className={classes.input}>
+                        <MenuItem value={'name'} selected>Pelo nome</MenuItem>
+                        <MenuItem value={'description'}>Pela descrição</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                )}                
               </Grid>
-              <Grid item>
-                <FormControl variant="outlined" className={classes.formControl} fullWidth>
-                  <InputLabel id="queryTypeSelectLabel">Como você quer pesquisar?</InputLabel>
-                  <Select labelId="queryTypeSelectLabel" id="queryTypeSelect" value={queryType}
-                    onChange={handleChangeQueryTypeSelect} label="Como você quer pesquisar?" >
-                    <MenuItem value={'name'} selected>Pelo nome</MenuItem>
-                    <MenuItem value={'description'}>Pela descrição</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item>
-                <SearchForm queryType={queryType} queryItem={queryItem}/>
+              <Grid container>
+                {(postOrGetSwitch)?(
+                  <AddForm queryType={queryType}/>
+                ):(
+                  <SearchForm queryType={queryType} queryItem={queryItem}/>
+                )}                
               </Grid>
             </Grid>
           </AccordionDetails>
