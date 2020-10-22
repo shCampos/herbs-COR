@@ -135,12 +135,16 @@ export default function App() {
               <Grid container direction="row" justify="center" alignItems="center" spacing={2}>
                 <Grid item>
                   <Typography component="div">
-                    <Grid component="label" container alignItems="center" spacing={1}>
-                      <Grid item>Pesquisar</Grid>
+                    <Grid component="label" container alignItems="center">
+                      <Grid item>
+                        <Typography variant="overline">pesquisar</Typography>
+                      </Grid>
                       <Grid item>
                         <Switch onChange={handlePostOrGetSwitchChange} name="postOrGetSwitch" />
                       </Grid>
-                      <Grid item>Adicionar</Grid>
+                      <Grid item>
+                        <Typography variant="overline">adicionar</Typography>
+                      </Grid>
                     </Grid>
                   </Typography>
                 </Grid>
@@ -165,14 +169,14 @@ export default function App() {
                       </Select>
                     </FormControl>
                   </Grid>
-                )}                
+                )}
               </Grid>
               <Grid container>
                 {(postOrGetSwitch)?(
-                  <AddForm queryType={queryType}/>
+                  <AddForm queryItem={queryItem}/>
                 ):(
                   <SearchForm queryType={queryType} queryItem={queryItem}/>
-                )}                
+                )}
               </Grid>
             </Grid>
           </AccordionDetails>
