@@ -40,6 +40,11 @@ export const styleObject = makeStyles((theme) => ({
     backgroundColor: theme.palette.text.secondary,
     color: '#fff'
   },
+  formControl: {
+    marginTop: '10px',
+    marginBottom: '10px',
+    width: '100%',
+  },
   input: {
     marginTop: '10px',
     marginBottom: '10px',
