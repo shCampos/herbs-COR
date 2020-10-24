@@ -25,6 +25,7 @@ function SingleResult(props) {
     getFamilyByKey(props.specie.familyKey, (dataFromFirebase) => {
       const auxFamily = Object.entries(dataFromFirebase)
       setSpecieFamily(auxFamily[0][1])
+      console.log(auxFamily[0][1])
     })
   }, [])
 
@@ -38,7 +39,18 @@ function SingleResult(props) {
             {props.specie.scientificName.split(' ').slice(2).join(' ')}
           </span>
         }
-        subheader={specieFamily.name.toUpperCase()}
+        subheader={
+          () => {          
+            getFamilyByKey(props.specie.familyKey, (dataFromFirebase) => {
+              const auxFamily = Object.entries(dataFromFirebase)
+              setSpecieFamily(auxFamily[0][1])
+              console.log(auxFamily[0][1])
+            })
+            return(
+              <span>{specieFamily.name.toUpperCase()}</span>
+            )
+          }          
+        }
       />
       <CardContent style={{width: '100%'}}>                          
         <Typography variant="body1" component="p" style={{textAlign: 'justify'}}>
