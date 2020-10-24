@@ -5,7 +5,9 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  Backdrop,
   Box,
+  CircularProgress,
   CssBaseline,
   FormControl,
   Grid,
@@ -19,10 +21,17 @@ import {
 import { Alert, AlertTitle } from '@material-ui/lab'
 import { Brightness7, ExpandMore, GitHub } from '@material-ui/icons'
 
+import { 
+  getAllFamilies,
+  getAllSpecies,
+} from './utils/firebase.js'
+
 import { themeObject } from './assets/themeObject.js'
 import { styleObject } from './assets/styleObject.js'
 
-import { SearchForm, AddForm } from './components/Forms'
+import { SearchForm, AddForm } from './components/forms'
+import Dashboard from './components/dashboard'
+import QueryResults from './components/query-results'
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -105,9 +114,57 @@ export default function App() {
     setPostOrGetSwitch(!postOrGetSwitch)
   }
 
+  const [familiesList, setFamiliesList] = useState([])
+  useEffect(() => {
+    getAllFamilies((dataFromFirebase) => {
+      if(typeof dataFromFirebase === 'undefined' || dataFromFirebase === null) {
+        setFamiliesList([])
+      } else {
+        const auxFamiliesList = Object.entries(dataFromFirebase).map((fam) => typeof fam[1].name !== 'undefined'&&{key: fam[0], ...fam[1]})
+        const withFirstLetterFamiliesList = auxFamiliesList.map((fam) => {
+          return {
+            ...fam,
+            firstLetter: fam.name[0].toUpperCase()
+          }
+        })
+        const sortedFamiliesList = withFirstLetterFamiliesList.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))
+        setFamiliesList(sortedFamiliesList)
+      }
+    })
+  }, [])
+
+  const [speciesList, setSpeciesList] = useState([])
+  useEffect(() => {
+    getAllSpecies((speciesFromDb) => {
+      if(typeof speciesFromDb === 'undefined' || speciesFromDb === null) {
+        setSpeciesList([])
+      } else {
+        const auxSpeciesList = Object.entries(speciesFromDb).map((specie) => typeof specie[1].scientificName !== 'undefined'&&specie[1])
+        const withFirstLetterSpeciesList = auxSpeciesList.map((specie) => {
+          return {
+            ...specie,
+            firstLetter: specie.scientificName[0].toUpperCase()
+          }
+        })
+        const sortedSpeciesList = withFirstLetterSpeciesList.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))
+        setSpeciesList(sortedSpeciesList)
+      }
+    })
+  }, [])
+
+  const [queryResultList, setQueryResultList] = useState([])
+
+  const [backdropVisible, setBackdropVisible] = useState(true)
+  useEffect(() => {
+    (speciesList.length && familiesList.length)?setBackdropVisible(false):setBackdropVisible(true)
+  }, [])
   return (
     <ThemeProvider theme={themeConfig}>
     <CssBaseline/>
+    <Backdrop className={classes.backdrop} open={backdropVisible}>
+      <CircularProgress color="inherit" />
+      <Typography variant="overline">Carregando dados...</Typography>
+    </Backdrop>
     <Grid container direction="row" justify="flex-start">
       <IconButton variant="contained" onClick={toogleDarkMode} style={{width: 'min-content', height: 'min-content'}}>
         <Brightness7/>
@@ -123,7 +180,7 @@ export default function App() {
       <Typography variant="h6" className={classes.siteDescription}>
         apenas um site para ajudar na identificação de espécies das Iniciações Científicas do Herbário-COR
       </Typography>
-      <div>
+      <div>        
         <Accordion expanded={expanded === 'panel1'} onChange={handlePanelChange('panel1')}>
           <AccordionSummary expandIcon={<ExpandMore />} aria-controls="panel1a-content" id="panel1a-header" className={classes.acordionHeader}>
             <Typography className={classes.heading} variant="overline">
@@ -175,10 +232,29 @@ export default function App() {
                 {(postOrGetSwitch)?(
                   <AddForm queryItem={queryItem}/>
                 ):(
-                  <SearchForm queryType={queryType} queryItem={queryItem}/>
+                  <SearchForm
+                    queryType={queryType}
+                    queryItem={queryItem}
+                    speciesList={speciesList}
+                    familiesList={familiesList}
+                    setQueryResultList={setQueryResultList}
+                  />
                 )}
               </Grid>
+              <Grid container>
+                {(queryResultList.length)&&(<QueryResults queryResultList={queryResultList}/>)}
+              </Grid>
             </Grid>
+          </AccordionDetails>
+        </Accordion>
+        <Accordion expanded={expanded === 'panel2'} onChange={handlePanelChange('panel2')}>
+          <AccordionSummary expandIcon={<ExpandMore />} aria-controls="panel1a-content" id="panel1a-header" className={classes.acordionHeader}>
+            <Typography className={classes.heading} variant="overline">
+              Dashboard completo
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails fullWidth className={classes.acordionBody}>
+            <Dashboard/>
           </AccordionDetails>
         </Accordion>
       </div>

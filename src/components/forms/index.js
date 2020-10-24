@@ -1,11 +1,12 @@
-import React, {useState, useEffect} from 'react'
+import React, { useState } from 'react'
 import {
   Button,
+  IconButton,
   Grid,
   TextField,
 } from '@material-ui/core'
-
 import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete'
+import { Search } from '@material-ui/icons'
 import { styleObject } from '../../assets/styleObject.js'
 
 import ByDescriptionForm from './ByDescriptionForm.js'
@@ -22,9 +23,9 @@ export function SearchForm(props) {
   return (
     <div>
       {(props.queryType == 'name')?(
-        <ByNameForm queryItem={props.queryItem}/>
+        <ByNameForm queryItem={props.queryItem} speciesList={props.speciesList}/>
       ):(
-        <ByDescriptionForm queryItem={props.queryItem}/>
+        <ByDescriptionForm queryItem={props.queryItem} familiesList={props.familiesList}/>
       )}
     </div>
   )
@@ -50,6 +51,8 @@ export function AddForm(props) {
 
   const searchNames = () => {
     console.log('newItem', newItem)
+    //search on bd
+      //search on gbif
     setSearchFlags({nameSearched: true})
   }
   
@@ -89,7 +92,9 @@ export function AddForm(props) {
           />
         </Grid>
         <Grid item xs={2}>
-          <Button onClick={searchNames}>Pesquisar</Button>
+          <IconButton variant="contained" onClick={searchNames} style={{width: 'min-content', height: 'min-content'}}>
+            <Search/>
+          </IconButton>
         </Grid>
       </Grid>
 

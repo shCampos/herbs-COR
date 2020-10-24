@@ -21,6 +21,10 @@ export const styleObject = makeStyles((theme) => ({
     paddingRight: '10px',
     backgroundColor: theme.palette.background
   },
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: '#fff',
+  },
   siteTitle: {
     color: theme.palette.text,
     fontFamily: 'David Libre'
