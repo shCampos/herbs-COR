@@ -1,27 +1,22 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   TextField
 } from '@material-ui/core'
 import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete'
 import { styleObject } from '../../assets/styleObject.js'
 
-const filter = createFilterOptions()
+//const filter = createFilterOptions()
 
 export default function ByNameForm(props) {
   const classes = styleObject()
-  let queryResultList;
 
-  useEffect(() => {
-    console.log('props', props)
-  }, [])
   return (
     <div>
       <Autocomplete
-        required id="itemName" name="itemName" className={classes.input}
-        value={queryResultList} options={props.specieList}
+        fullWidth required id="itemName" name="itemName"
+        className={classes.input} options={props.speciesList}
         onChange={(event, newValue) => {
-          console.log(newValue)
-          //props.setQueryResultList([newValue])
+          props.setQueryResultList([newValue])
         }}
         groupBy={(option) => option.firstLetter}
         getOptionLabel={(option) => {

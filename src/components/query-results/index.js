@@ -12,9 +12,9 @@ import { getFamilyByKey } from '../../utils/firebase.js'
 export default function QueryResults(props) {
   return (
     <div>{(props.queryResultList.length > 1)?(
-      <SingleResult specie={props.queryResultList[0]}/>
-    ):(
       <MultipleResults/>
+    ):(
+      <SingleResult specie={props.queryResultList[0]}/>
     )}</div>
   )
 }

@@ -22,8 +22,12 @@ const handleFormSubmit = callback => event => {
 export function SearchForm(props) {
   return (
     <div>
-      {(props.queryType == 'name')?(
-        <ByNameForm queryItem={props.queryItem} speciesList={props.speciesList}/>
+      {(props.queryType == 'name' && props.speciesList.length)?(
+        <ByNameForm
+          queryItem={props.queryItem}
+          speciesList={props.speciesList}
+          setQueryResultList={props.setQueryResultList}
+        />
       ):(
         <ByDescriptionForm queryItem={props.queryItem} familiesList={props.familiesList}/>
       )}
@@ -57,7 +61,7 @@ export function AddForm(props) {
   }
   
   return (
-    <form onSubmit={handleFormSubmit(addFormSubmit)} autoComplete="off" style={{width: '100%'}}>
+    <form onSubmit={handleFormSubmit(addFormSubmit)} ap7utoComplete="off" style={{width: '100%'}}>
       {/* <Grid container fullWidth style={{marginBottom: '10px'}}>
         {(flagAlert.sucessSendDescription)&&(
           <Alert variant="filled" style={{width: '100%'}} severity="success">Descrição enviada ao banco de dados.</Alert>

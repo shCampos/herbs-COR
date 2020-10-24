@@ -148,6 +148,7 @@ export default function App() {
         })
         const sortedSpeciesList = withFirstLetterSpeciesList.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))
         setSpeciesList(sortedSpeciesList)
+        setBackdropVisible(false)
       }
     })
   }, [])
@@ -155,9 +156,6 @@ export default function App() {
   const [queryResultList, setQueryResultList] = useState([])
 
   const [backdropVisible, setBackdropVisible] = useState(true)
-  useEffect(() => {
-    (speciesList.length && familiesList.length)?setBackdropVisible(false):setBackdropVisible(true)
-  }, [])
   return (
     <ThemeProvider theme={themeConfig}>
     <CssBaseline/>
@@ -228,19 +226,21 @@ export default function App() {
                   </Grid>
                 )}
               </Grid>
-              <Grid container>
-                {(postOrGetSwitch)?(
-                  <AddForm queryItem={queryItem}/>
-                ):(
-                  <SearchForm
-                    queryType={queryType}
-                    queryItem={queryItem}
-                    speciesList={speciesList}
-                    familiesList={familiesList}
-                    setQueryResultList={setQueryResultList}
-                  />
-                )}
-              </Grid>
+              {(speciesList.length > 0 && familiesList.length > 0)&&(
+                <Grid container>
+                  {(postOrGetSwitch)?(
+                    <AddForm queryItem={queryItem}/>
+                  ):(
+                    <SearchForm
+                      queryType={queryType}
+                      queryItem={queryItem}
+                      speciesList={speciesList}
+                      familiesList={familiesList}
+                      setQueryResultList={setQueryResultList}
+                    />
+                  )}
+                </Grid>
+              )}
               <Grid container>
                 {(queryResultList.length)&&(<QueryResults queryResultList={queryResultList}/>)}
               </Grid>
