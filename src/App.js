@@ -242,7 +242,7 @@ export default function App() {
                 </Grid>
               )}
               <Grid container>
-                {(queryResultList.length)&&(<QueryResults queryResultList={queryResultList}/>)}
+                {(queryResultList.length >= 1)&&(<QueryResults queryResultList={queryResultList}/>)}
               </Grid>
             </Grid>
           </AccordionDetails>

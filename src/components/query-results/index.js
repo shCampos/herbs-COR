@@ -21,13 +21,6 @@ export default function QueryResults(props) {
 
 function SingleResult(props) {
   const [specieFamily, setSpecieFamily] = useState({})
-  useEffect(() => {
-    getFamilyByKey(props.specie.familyKey, (dataFromFirebase) => {
-      const auxFamily = Object.entries(dataFromFirebase)
-      setSpecieFamily(auxFamily[0][1])
-      console.log(auxFamily[0][1])
-    })
-  }, [])
 
   return (
     <Card variant="outlined" style={{width: '100%'}}>

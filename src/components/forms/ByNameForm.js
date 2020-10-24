@@ -16,7 +16,7 @@ export default function ByNameForm(props) {
         fullWidth required id="itemName" name="itemName"
         className={classes.input} options={props.speciesList}
         onChange={(event, newValue) => {
-          props.setQueryResultList([newValue])
+          (newValue == null)?props.setQueryResultList([]):props.setQueryResultList([newValue])
         }}
         groupBy={(option) => option.firstLetter}
         getOptionLabel={(option) => {
