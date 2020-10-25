@@ -19,7 +19,7 @@ const handleFormSubmit = callback => event => {
 export function SearchForm(props) {
   return (
     <div>
-      {(props.queryType == 'name' && props.speciesList.length)?(
+      {(props.queryType === 'name' && props.speciesList.length)?(
         <ByNameForm
           queryItem={props.queryItem}
           speciesList={props.speciesList}
@@ -94,7 +94,7 @@ export function AddForm(props) {
             fullWidth required id="itemName" name="itemName"
             onChange={handleAddFormChange} value={newItem.itemName}
             className={classes.input} variant="outlined"
-            label={props.queryItem=='specie'?"Nome da espécie com autor":"Nome do gênero com autor"}
+            label={props.queryItem==='specie'?"Nome da espécie com autor":"Nome do gênero com autor"}
           />
         </Grid>
         <Grid item xs={2}>

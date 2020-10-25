@@ -155,6 +155,9 @@ export default function App() {
   }, [])
 
   const [queryResultList, setQueryResultList] = useState([])
+  const clearQueryResultList = () => {
+    setQueryResultList([])
+  }
   const [backdropVisible, setBackdropVisible] = useState(true)
 
   return (
@@ -248,7 +251,8 @@ export default function App() {
                 {(queryResultList.length >= 1)&&(
                   <div>
                     <QueryResults queryResultList={queryResultList}/>
-                    <Button variant="contained" className={classes.btn} color="primary" onClick={setQueryResultList([])}>
+                    <Button variant="contained" className={classes.btn} color="primary" 
+                      onClick={clearQueryResultList}>
                       Continuar pesquisando
                     </Button>
                   </div>
