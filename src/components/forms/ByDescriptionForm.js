@@ -3,10 +3,9 @@ import {
   Button,
   TextField
 } from '@material-ui/core'
-import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete'
+import { Autocomplete } from '@material-ui/lab'
 import { styleObject } from '../../assets/styleObject.js'
-
-const filter = createFilterOptions()
+import { compareDescriptions } from '../../utils/compareDescriptions.js'
 
 export default function ByDescriptionForm(props) {
   const classes = styleObject()
@@ -18,15 +17,14 @@ export default function ByDescriptionForm(props) {
     callback()
   }
 
-  const [itemDescription, setItemDescription] = useState({})
+  const [itemDescription, setItemDescription] = useState('')
   const handleAddFormChange = (event) => {
-    const auxValues = { ...itemDescription }
-    auxValues[event.target.name] = event.target.value
-    setItemDescription(auxValues)
+    setItemDescription(event.target.value)
   }
 
-  const searchSpecie = () => {
-    console.log('foi')
+  const searchSpecie = async () => {
+    const auxQueryResultList = await compareDescriptions(itemDescription, props.speciesList)
+    props.setQueryResultList(auxQueryResultList)
   }
 
   return (

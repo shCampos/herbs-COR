@@ -5,14 +5,11 @@ import {
   Grid,
   TextField,
 } from '@material-ui/core'
-import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete'
 import { Search } from '@material-ui/icons'
 import { styleObject } from '../../assets/styleObject.js'
 
 import ByDescriptionForm from './ByDescriptionForm.js'
 import ByNameForm from './ByNameForm.js'
-
-const filter = createFilterOptions()
 
 const handleFormSubmit = callback => event => {
   event.preventDefault()
@@ -29,7 +26,12 @@ export function SearchForm(props) {
           setQueryResultList={props.setQueryResultList}
         />
       ):(
-        <ByDescriptionForm queryItem={props.queryItem} familiesList={props.familiesList}/>
+        <ByDescriptionForm
+          queryItem={props.queryItem}
+          familiesList={props.familiesList}
+          speciesList={props.speciesList}
+          setQueryResultList={props.setQueryResultList}
+        />
       )}
     </div>
   )

@@ -7,6 +7,7 @@ import {
   AccordionDetails,
   Backdrop,
   Box,
+  Button,
   CircularProgress,
   CssBaseline,
   FormControl,
@@ -154,14 +155,16 @@ export default function App() {
   }, [])
 
   const [queryResultList, setQueryResultList] = useState([])
-
   const [backdropVisible, setBackdropVisible] = useState(true)
+
   return (
     <ThemeProvider theme={themeConfig}>
     <CssBaseline/>
     <Backdrop className={classes.backdrop} open={backdropVisible}>
-      <CircularProgress color="inherit" />
-      <Typography variant="overline">Carregando dados...</Typography>
+      <Grid container direction="column" justify="center" alignItems="center">
+        <CircularProgress color="inherit" />
+        <Typography variant="h6">Carregando dados...</Typography>
+      </Grid>
     </Backdrop>
     <Grid container direction="row" justify="flex-start">
       <IconButton variant="contained" onClick={toogleDarkMode} style={{width: 'min-content', height: 'min-content'}}>
@@ -226,7 +229,7 @@ export default function App() {
                   </Grid>
                 )}
               </Grid>
-              {(speciesList.length > 0 && familiesList.length > 0)&&(
+              {(speciesList.length > 0 && familiesList.length > 0 && queryResultList.length == 0)&&(
                 <Grid container>
                   {(postOrGetSwitch)?(
                     <AddForm queryItem={queryItem}/>
@@ -242,7 +245,14 @@ export default function App() {
                 </Grid>
               )}
               <Grid container>
-                {(queryResultList.length >= 1)&&(<QueryResults queryResultList={queryResultList}/>)}
+                {(queryResultList.length >= 1)&&(
+                  <div>
+                    <QueryResults queryResultList={queryResultList}/>
+                    <Button variant="contained" className={classes.btn} color="primary" onClick={setQueryResultList([])}>
+                      Continuar pesquisando
+                    </Button>
+                  </div>
+                )}
               </Grid>
             </Grid>
           </AccordionDetails>

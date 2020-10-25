@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import {
   TextField
 } from '@material-ui/core'
-import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete'
+import { Autocomplete } from '@material-ui/lab'
 import { styleObject } from '../../assets/styleObject.js'
-
-//const filter = createFilterOptions()
 
 export default function ByNameForm(props) {
   const classes = styleObject()
