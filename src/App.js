@@ -19,7 +19,6 @@ import {
   Switch,
   ThemeProvider,
   Typography } from '@material-ui/core'
-import { Alert, AlertTitle } from '@material-ui/lab'
 import { Add, Brightness7, ExpandMore, GitHub, Search, } from '@material-ui/icons'
 
 import { 
