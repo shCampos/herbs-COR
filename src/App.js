@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import PropTypes from 'prop-types'
 import { createMuiTheme } from '@material-ui/core/styles'
 import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
   Backdrop,
-  Box,
   Button,
   CircularProgress,
   CssBaseline,
@@ -32,40 +30,6 @@ import { styleObject } from './assets/styleObject.js'
 import { SearchForm, AddForm } from './components/forms'
 import Dashboard from './components/dashboard'
 import QueryResults from './components/query-results'
-
-function TabPanel(props) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      style={{width: '100%'}}
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box p={3}>
-          {children}
-        </Box>
-      )}
-    </div>
-  )
-}
-
-TabPanel.propTypes = {
-  children: PropTypes.node,
-  index: PropTypes.any.isRequired,
-  value: PropTypes.any.isRequired,
-};
-
-function a11yProps(index) {
-  return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
-  };
-}
 
 const useDarkMode = () => {
   const [theme, setTheme] = useState(themeObject)
@@ -231,7 +195,7 @@ export default function App() {
                   </Grid>
                 )}
               </Grid>
-              {(speciesList.length > 0 && familiesList.length > 0 && queryResultList.length == 0)&&(
+              {(speciesList.length > 0 && familiesList.length > 0 && queryResultList.length === 0)&&(
                 <Grid item>
                   {(postOrGetSwitch)?(
                     <AddForm queryItem={queryItem}/>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import {
   Avatar,
   Card,
@@ -14,8 +14,6 @@ import {
 } from '@material-ui/core'
 import { styleObject } from '../../assets/styleObject.js'
 import { getFamilyByKey } from '../../utils/firebase.js'
-
-
 
 export default function QueryResults(props) {
   return (

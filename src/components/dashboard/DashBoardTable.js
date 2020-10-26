@@ -46,7 +46,7 @@ export default function DashboardTable(props) {
 					</TableHead>
 					<TableBody>
 						{props.speciesList.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((specie) => {
-							const family = props.familiesList.filter((family)=>family.key == specie.familyKey)
+							const family = props.familiesList.filter((family)=>family.key === specie.familyKey)
 							return (                
 								<Row specie={{...specie, familyName: family[0].name}}/>
 							)

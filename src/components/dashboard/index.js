@@ -1,15 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import {
   Grid,
 } from '@material-ui/core'
-import { styleObject } from '../../assets/styleObject.js'
 
 import DashBoardTable from './DashBoardTable.js'
 import DashBoardMenu from './DashBoardMenu.js'
 
 export default function Dashboard(props) {
-  const classes = styleObject()
-
   /*
     ações de filtro
     Tabela
