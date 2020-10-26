@@ -26,7 +26,6 @@ export default function QueryResults(props) {
 }
 
 function SingleResult(props) {
-  const classes = styleObject()
   const [specieFamily, setSpecieFamily] = useState({})
 
   return (
