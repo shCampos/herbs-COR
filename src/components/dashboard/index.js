@@ -1,6 +1,49 @@
 import React, { useEffect, useState } from 'react'
+import {
+  Box,
+  CircularProgress,
+  Collapse,
+  IconButton,
+  Grid,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TablePagination,
+  TableRow,
+  Typography,
+} from '@material-ui/core'
+import { Delete, Description, Edit } from '@material-ui/icons';
+import { styleObject, useRowStyles } from '../../assets/styleObject.js'
 
-export default function Dashboard() {
+function createData(name, calories, fat, carbs, protein) {
+  return { name, calories, fat, carbs, protein };
+}
+
+const rows = [
+  createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
+  createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
+  createData('Eclair', 262, 16.0, 24, 6.0),
+  createData('Cupcake', 305, 3.7, 67, 4.3),
+  createData('Gingerbread', 356, 16.0, 49, 3.9),
+];
+
+export default function Dashboard(props) {
+  const classes = styleObject()
+
+  const [page, setPage] = React.useState(0)
+  const [rowsPerPage, setRowsPerPage] = React.useState(10)
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage)
+  }
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(+event.target.value)
+    setPage(0)
+  }
   /*
     ações de filtro
     Tabela
@@ -9,6 +52,81 @@ export default function Dashboard() {
 
   */
   return (
-    <div>em construção</div>
+    <Grid container direction="column">
+      <Grid item>
+        menu
+      </Grid>
+      <Grid item>
+        <TableContainer component={Paper} className={classes.tableDashboard}>
+          <Table stickyHeader className={classes.table} small>
+            <TableHead>
+              <TableRow>
+                <TableCell>Espécie</TableCell>
+                <TableCell>Família</TableCell>
+                <TableCell align="center">Ações</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {props.speciesList.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((specie) => {
+                const family = props.familiesList.filter((family)=>family.key == specie.familyKey)
+                return (                
+                  <Row specie={{...specie, familyName: family[0].name}}/>
+                )
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <TablePagination
+          rowsPerPageOptions={[10, 25, 100]}
+          component="div"
+          count={props.speciesList.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onChangePage={handleChangePage}
+          onChangeRowsPerPage={handleChangeRowsPerPage}
+        />
+      </Grid>
+    </Grid>
   )
+}
+
+function Row(props) {
+  const { specie } = props;
+  const [open, setOpen] = React.useState(false);
+  const classes = useRowStyles();
+
+  return (
+    <React.Fragment>
+      <TableRow className={classes.root}>
+        <TableCell component="th" scope="row">
+          {specie.scientificName}
+        </TableCell>
+        <TableCell>{specie.familyName}</TableCell> 
+        <TableCell>
+          <Grid container direction="row">            
+            <IconButton aria-label="descrição" size="small" onClick={() => setOpen(!open)}>
+              <Description style={{color: "#3975B8"}}/>
+            </IconButton>
+            <IconButton aria-label="editar" size="small" onClick={() => setOpen(!open)}>
+              <Edit style={{color: "#B85014"}}/>
+            </IconButton>
+            <IconButton aria-label="excluir" size="small" onClick={() => setOpen(!open)}>
+              <Delete color="error"/>
+            </IconButton>
+          </Grid>          
+        </TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+          <Collapse in={open} timeout="auto" unmountOnExit>
+            <Box margin={1}>
+              <Typography variant="body" gutterBottom component="div">
+                {specie.description}
+              </Typography>
+            </Box>
+          </Collapse>
+        </TableCell>
+      </TableRow>
+    </React.Fragment>
+  );
 }

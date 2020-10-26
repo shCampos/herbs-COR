@@ -20,7 +20,7 @@ import {
   ThemeProvider,
   Typography } from '@material-ui/core'
 import { Alert, AlertTitle } from '@material-ui/lab'
-import { Brightness7, ExpandMore, GitHub } from '@material-ui/icons'
+import { Add, Brightness7, ExpandMore, GitHub, Search, } from '@material-ui/icons'
 
 import { 
   getAllFamilies,
@@ -184,7 +184,7 @@ export default function App() {
       <Typography variant="h6" className={classes.siteDescription}>
         apenas um site para ajudar na identificação de espécies das Iniciações Científicas do Herbário-COR
       </Typography>
-      <div>        
+      <div style={{width: 'fit-content'}}>
         <Accordion expanded={expanded === 'panel1'} onChange={handlePanelChange('panel1')}>
           <AccordionSummary expandIcon={<ExpandMore />} aria-controls="panel1a-content" id="panel1a-header" className={classes.acordionHeader}>
             <Typography className={classes.heading} variant="overline">
@@ -194,24 +194,24 @@ export default function App() {
           <AccordionDetails fullWidth className={classes.acordionBody}>
             <Grid container direction="column">
               <Grid container direction="row" justify="center" alignItems="center" spacing={2}>
-                <Grid item>
+                <Grid item xs={4}>
                   <Typography component="div">
-                    <Grid component="label" container alignItems="center">
+                    <Grid component="label" container alignItems="center" spacing={0}>
                       <Grid item>
-                        <Typography variant="overline">pesquisar</Typography>
+                        <Search/>
                       </Grid>
                       <Grid item>
                         <Switch onChange={handlePostOrGetSwitchChange} name="postOrGetSwitch" />
                       </Grid>
                       <Grid item>
-                        <Typography variant="overline">adicionar</Typography>
+                        <Add/>
                       </Grid>
                     </Grid>
                   </Typography>
                 </Grid>
-                <Grid item>
-                  <FormControl variant="outlined" className={classes.formControl} fullWidth>
-                    <InputLabel id="queryItemSelectLabel">O que você quer {(postOrGetSwitch)?'adicionar':'pesquisar'}?</InputLabel>
+                <Grid item xs={4}>
+                  <FormControl variant="outlined" className={classes.formControl}>
+                    <InputLabel id="queryItemSelectLabel">O que {(postOrGetSwitch)?'adicionar':'pesquisar'}?</InputLabel>
                     <Select labelId="queryItemSelectLabel" id="queryItemSelect" value={queryItem}
                       onChange={handleChangeQueryItemSelect} className={classes.input}>
                       <MenuItem value={'specie'} selected>Espécie</MenuItem>
@@ -220,9 +220,9 @@ export default function App() {
                   </FormControl>
                 </Grid>
                 {(!postOrGetSwitch)&&(
-                  <Grid item>                  
-                    <FormControl variant="outlined" className={classes.formControl} fullWidth>
-                      <InputLabel id="queryTypeSelectLabel">Como você quer pesquisar?</InputLabel>
+                  <Grid item xs={4}>                  
+                    <FormControl variant="outlined" className={classes.formControl}>
+                      <InputLabel id="queryTypeSelectLabel">Como pesquisar?</InputLabel>
                       <Select labelId="queryTypeSelectLabel" id="queryTypeSelect" value={queryType}
                         onChange={handleChangeQueryTypeSelect} className={classes.input}>
                         <MenuItem value={'name'} selected>Pelo nome</MenuItem>
@@ -233,7 +233,7 @@ export default function App() {
                 )}
               </Grid>
               {(speciesList.length > 0 && familiesList.length > 0 && queryResultList.length == 0)&&(
-                <Grid container>
+                <Grid item>
                   {(postOrGetSwitch)?(
                     <AddForm queryItem={queryItem}/>
                   ):(
@@ -247,17 +247,15 @@ export default function App() {
                   )}
                 </Grid>
               )}
-              <Grid container>
-                {(queryResultList.length >= 1)&&(
-                  <div>
-                    <QueryResults queryResultList={queryResultList}/>
-                    <Button variant="contained" className={classes.btn} color="primary" 
-                      onClick={clearQueryResultList}>
-                      Continuar pesquisando
-                    </Button>
-                  </div>
-                )}
-              </Grid>
+              {(queryResultList.length >= 1)&&(
+                <Grid item>
+                  <QueryResults queryResultList={queryResultList}/>
+                  <Button variant="contained" className={classes.btn} color="primary" 
+                    onClick={clearQueryResultList}>
+                    Continuar pesquisando
+                  </Button>
+                </Grid>
+              )}
             </Grid>
           </AccordionDetails>
         </Accordion>
@@ -268,7 +266,12 @@ export default function App() {
             </Typography>
           </AccordionSummary>
           <AccordionDetails fullWidth className={classes.acordionBody}>
-            <Dashboard/>
+            {(speciesList.length > 0 && familiesList.length > 0)&&(
+              <Dashboard
+                speciesList={speciesList}
+                familiesList={familiesList}
+              />
+            )}
           </AccordionDetails>
         </Accordion>
       </div>

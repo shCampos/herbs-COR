@@ -18,7 +18,7 @@ const handleFormSubmit = callback => event => {
 
 export function SearchForm(props) {
   return (
-    <div>
+    <div style={{width: '100%'}}>
       {(props.queryType === 'name' && props.speciesList.length)?(
         <ByNameForm
           queryItem={props.queryItem}
@@ -63,7 +63,7 @@ export function AddForm(props) {
   }
   
   return (
-    <form onSubmit={handleFormSubmit(addFormSubmit)} ap7utoComplete="off" style={{width: '100%'}}>
+    <form onSubmit={handleFormSubmit(addFormSubmit)} autoComplete="off">
       {/* <Grid container fullWidth style={{marginBottom: '10px'}}>
         {(flagAlert.sucessSendDescription)&&(
           <Alert variant="filled" style={{width: '100%'}} severity="success">Descrição enviada ao banco de dados.</Alert>
@@ -81,24 +81,24 @@ export function AddForm(props) {
           <Alert variant="filled" style={{width: '100%'}} severity="warning">Essa espécie já foi inclusa no banco de dados.</Alert>
         )}
       </Grid> */}
-      <Grid container spacing={2}>
-        <Grid item xs={5}>
+      <Grid container direction="row" justify="center" alignItems="center" spacing={2}>
+        <Grid item>
           <TextField
-            fullWidth required id="itemFamily" name="itemFamily"
+            required id="itemFamily" name="itemFamily"
             onChange={handleAddFormChange} value={newItem.itemFamily}
-            className={classes.input} label="Nome da espécie com autor" variant="outlined"
+            className={classes.input} label="Nome da família" variant="outlined"
           />
         </Grid>
-        <Grid item xs={5}>
+        <Grid item>
           <TextField
-            fullWidth required id="itemName" name="itemName"
+            required id="itemName" name="itemName"
             onChange={handleAddFormChange} value={newItem.itemName}
             className={classes.input} variant="outlined"
-            label={props.queryItem==='specie'?"Nome da espécie com autor":"Nome do gênero com autor"}
+            label={props.queryItem==='specie'?"Nome da espécie":"Nome do gênero"}
           />
         </Grid>
-        <Grid item xs={2}>
-          <IconButton variant="contained" onClick={searchNames} style={{width: 'min-content', height: 'min-content'}}>
+        <Grid item>
+          <IconButton variant="contained" color="primary" onClick={searchNames} style={{width: 'min-content', height: 'min-content'}}>
             <Search/>
           </IconButton>
         </Grid>
@@ -116,7 +116,8 @@ export function AddForm(props) {
         onChange={handleAddFormChange} className={classes.input}
         label="Referência (coloque nas normas da ABNT)" variant="outlined"
       />
-      <Button type="submit" variant="contained" className={classes.btn} color="primary">
+      <Button type="submit" variant="contained" className={classes.btn} color="primary"
+        disabled={!searchFlags.nameSearched}>
         Enviar
       </Button>
     </form>
