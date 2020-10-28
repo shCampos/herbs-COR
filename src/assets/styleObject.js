@@ -10,14 +10,6 @@ function getWindowDimensions() {
 
 const { height, width } = getWindowDimensions()
 
-export const useRowStyles = makeStyles({
-  root: {
-    '& > *': {
-      borderBottom: 'unset',
-    },
-  },
-});
-
 export const styleObject = makeStyles((theme) => ({
   root: {
     flexGrow: 1,

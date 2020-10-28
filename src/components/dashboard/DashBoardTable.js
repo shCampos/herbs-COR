@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import {
   Box,
   Collapse,
-  IconButton,
+	IconButton,
+	InputAdornment,
   Grid,
   Paper,
   Table,
@@ -16,9 +17,9 @@ import {
   Typography,
 } from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
-import { Delete, Description, Edit } from '@material-ui/icons';
+import { Delete, Description, Edit, FilterList } from '@material-ui/icons';
 
-import { styleObject, useRowStyles } from '../../assets/styleObject.js'
+import { styleObject } from '../../assets/styleObject.js'
 
 export default function DashboardTable(props) {
 	const classes = styleObject()
@@ -42,7 +43,7 @@ export default function DashboardTable(props) {
 				<Alert severity="warning" variant="filled" style={{width: '100%'}}>Não foi encontrada nenhuma espécie!</Alert>
 			)}
 			<TableContainer className={classes.tableDashboard}>
-				<Table stickyHeader className={classes.table} small>
+				<Table stickyHeader className={classes.table} size="small">
 					<TableHead>
 						<TableRow style={{width: '100%'}}>
 							<TableCell>Espécie</TableCell>
@@ -61,13 +62,15 @@ export default function DashboardTable(props) {
 						{currentSpeciesList.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((specie) => {
 							const family = props.familiesList.filter((family)=>family.key === specie.familyKey)
 							return (                
-								<DataRow specie={{...specie, familyName: family[0].name}}/>
+								<DataRow
+								specie={{...specie, familyName: family[0].name}}/>
 							)
 						})}
 					</TableBody>
 				</Table>
 			</TableContainer>
 			<TablePagination
+				labelRowsPerPage="Espécies por página:"
 				rowsPerPageOptions={[10, 25, 100]}
 				component="div"
 				count={currentSpeciesList.length}
@@ -96,7 +99,7 @@ function FilterRow(props) {
 		} else {
 			props.setCurrentSpeciesListIsEmpty(false)
 			props.setCurrentSpeciesList(auxCurrentSpeciesList)
-		}		
+		}
 	}
 
 	const handleFamilyNameChangeName = (event) => {
@@ -112,7 +115,7 @@ function FilterRow(props) {
 		} else {
 			props.setCurrentSpeciesListIsEmpty(false)
 			props.setCurrentSpeciesList(auxCurrentSpeciesList)
-		}		
+		}
 	}
 
 	return (
@@ -122,14 +125,14 @@ function FilterRow(props) {
 					<TextField
 						fullWidth id="specieNameFilterParam" name="specieNameFilterParam"
 						onChange={handleSpecieNameChange} className={classes.input}
-						label="Filtrar pela espécie" variant="outlined"
+						label="Filtrar pela espécie" variant="outlined" size="small"
 					/>
 				</TableCell>
 				<TableCell>
 				<TextField
 						fullWidth id="familyNameFilterParam" name="familyNameFilterParam"
 						onChange={handleFamilyNameChangeName} className={classes.input}
-						label="Filtrar pela família" variant="outlined"
+						label="Filtrar pela família" variant="outlined" size="small"
 					/>
 				</TableCell>
 				<TableCell></TableCell>
@@ -141,7 +144,6 @@ function FilterRow(props) {
 function DataRow(props) {
 	const { specie } = props;
 	const [open, setOpen] = React.useState(false);
-	const classes = useRowStyles();
 
 	return (
 		<React.Fragment>
@@ -173,10 +175,13 @@ function DataRow(props) {
 							<Typography variant="body" gutterBottom component="div">
 								{specie.description}
 							</Typography>
+							<Typography variant="caption" style={{textAlign: 'justify', fontWeight: 'bold'}}>
+								{specie.reference}
+							</Typography>
 						</Box>
 					</Collapse>
 				</TableCell>
 			</TableRow>
 		</React.Fragment>
-	);
+	)
 }
