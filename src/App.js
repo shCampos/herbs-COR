@@ -67,10 +67,12 @@ export default function App() {
   const [queryType, setQueryType] = useState('name')
   const handleChangeQueryTypeSelect = (event) => {
     setQueryType(event.target.value)
+    clearQueryResultList()
   }
   const [queryItem, setQueryItem] = useState('specie')
   const handleChangeQueryItemSelect = (event) => {
     setQueryItem(event.target.value)
+    clearQueryResultList()
   }
 
   const [postOrGetSwitch, setPostOrGetSwitch] = useState(false)
