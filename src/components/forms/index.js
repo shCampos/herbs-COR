@@ -6,15 +6,12 @@ import {
   TextField,
 } from '@material-ui/core'
 import { Search } from '@material-ui/icons'
+
 import { styleObject } from '../../assets/styleObject.js'
+import { searchFamilyAndSpecieNames } from '../../utils/gbif.js'
 
 import ByDescriptionForm from './ByDescriptionForm.js'
 import ByNameForm from './ByNameForm.js'
-
-const handleFormSubmit = callback => event => {
-  event.preventDefault()
-  callback()
-}
 
 export function SearchForm(props) {
   return (
@@ -47,6 +44,11 @@ export function AddForm(props) {
     setNewItem(auxValues)
   }
 
+  const handleFormSubmit = callback => event => {
+    event.preventDefault()
+    callback()
+  }
+
   const addFormSubmit = () => {
     console.log('foi')
   }
@@ -57,6 +59,7 @@ export function AddForm(props) {
 
   const searchNames = () => {
     console.log('newItem', newItem)
+    //searchFamilyAndSpecieNames(newItem.itemFamily, newItem.itemName)
     //search on bd
       //search on gbif
     setSearchFlags({nameSearched: true})

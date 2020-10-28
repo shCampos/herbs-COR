@@ -125,14 +125,14 @@ function FilterRow(props) {
 					<TextField
 						fullWidth id="specieNameFilterParam" name="specieNameFilterParam"
 						onChange={handleSpecieNameChange} className={classes.input}
-						label="Filtrar pela espécie" variant="outlined" size="small"
+						label="Filtrar pela espécie" size="small"
 					/>
 				</TableCell>
 				<TableCell>
 				<TextField
 						fullWidth id="familyNameFilterParam" name="familyNameFilterParam"
 						onChange={handleFamilyNameChangeName} className={classes.input}
-						label="Filtrar pela família" variant="outlined" size="small"
+						label="Filtrar pela família" size="small"
 					/>
 				</TableCell>
 				<TableCell></TableCell>
@@ -159,10 +159,10 @@ function DataRow(props) {
 						<IconButton aria-label="descrição" size="small" onClick={() => setOpen(!open)}>
 							<Description style={{color: "#3975B8"}}/>
 						</IconButton>
-						<IconButton aria-label="editar" size="small" onClick={() => setOpen(!open)}>
+						<IconButton aria-label="editar" size="small" disabled>
 							<Edit style={{color: "#B85014"}}/>
 						</IconButton>
-						<IconButton aria-label="excluir" size="small" onClick={() => setOpen(!open)}>
+						<IconButton aria-label="excluir" size="small" disabled>
 							<Delete color="error"/>
 						</IconButton>
 					</Grid>
