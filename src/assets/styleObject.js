@@ -75,6 +75,7 @@ export const styleObject = makeStyles((theme) => ({
     width: '100%'
   },
   tableDashboard: {
+    width: '100%',
     maxHeight: 440
   }
 }))

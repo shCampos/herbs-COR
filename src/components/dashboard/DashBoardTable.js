@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Box,
   Collapse,
@@ -11,44 +11,57 @@ import {
   TableContainer,
   TableHead,
   TablePagination,
-  TableRow,
+	TableRow,
+	TextField,
   Typography,
 } from '@material-ui/core'
-
+import { Alert } from '@material-ui/lab'
 import { Delete, Description, Edit } from '@material-ui/icons';
+
 import { styleObject, useRowStyles } from '../../assets/styleObject.js'
 
 export default function DashboardTable(props) {
 	const classes = styleObject()
 
-  const [page, setPage] = React.useState(0)
-  const [rowsPerPage, setRowsPerPage] = React.useState(10)
-
+  const [page, setPage] = useState(0)
+  const [rowsPerPage, setRowsPerPage] = useState(10)
   const handleChangePage = (event, newPage) => {
     setPage(newPage)
   }
-
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value)
     setPage(0)
 	}
 	
+	const [currentSpeciesList, setCurrentSpeciesList] = useState(props.speciesList)
+	const [currentSpeciesListIsEmpty, setCurrentSpeciesListIsEmpty] = useState(false)
+
 	return (
 		<Paper>
+			{(currentSpeciesListIsEmpty)&&(
+				<Alert severity="warning" variant="filled" style={{width: '100%'}}>Não foi encontrada nenhuma espécie!</Alert>
+			)}
 			<TableContainer className={classes.tableDashboard}>
 				<Table stickyHeader className={classes.table} small>
 					<TableHead>
-						<TableRow>
+						<TableRow style={{width: '100%'}}>
 							<TableCell>Espécie</TableCell>
 							<TableCell>Família</TableCell>
 							<TableCell align="center">Ações</TableCell>
 						</TableRow>
 					</TableHead>
 					<TableBody>
-						{props.speciesList.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((specie) => {
+						<FilterRow
+							speciesList={props.speciesList}
+							familiesList={props.familiesList}
+							currentSpeciesList={currentSpeciesList}
+							setCurrentSpeciesList={setCurrentSpeciesList}
+							setCurrentSpeciesListIsEmpty={setCurrentSpeciesListIsEmpty}
+						/>
+						{currentSpeciesList.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((specie) => {
 							const family = props.familiesList.filter((family)=>family.key === specie.familyKey)
 							return (                
-								<Row specie={{...specie, familyName: family[0].name}}/>
+								<DataRow specie={{...specie, familyName: family[0].name}}/>
 							)
 						})}
 					</TableBody>
@@ -57,7 +70,7 @@ export default function DashboardTable(props) {
 			<TablePagination
 				rowsPerPageOptions={[10, 25, 100]}
 				component="div"
-				count={props.speciesList.length}
+				count={currentSpeciesList.length}
 				rowsPerPage={rowsPerPage}
 				page={page}
 				onChangePage={handleChangePage}
@@ -66,19 +79,80 @@ export default function DashboardTable(props) {
 		</Paper>
 	)
 }
-function Row(props) {
+
+function FilterRow(props) {
+	const classes = styleObject()
+
+	const handleSpecieNameChange = (event) => {
+		let auxCurrentSpeciesList = []
+		props.currentSpeciesList.map((specie) => {
+			if(specie.scientificName.includes(event.target.value)) {
+				auxCurrentSpeciesList.push(specie)
+			}
+		})
+		if(auxCurrentSpeciesList.length == 0) {
+			props.setCurrentSpeciesListIsEmpty(true)
+			props.setCurrentSpeciesList(props.speciesList)
+		} else {
+			props.setCurrentSpeciesListIsEmpty(false)
+			props.setCurrentSpeciesList(auxCurrentSpeciesList)
+		}		
+	}
+
+	const handleFamilyNameChangeName = (event) => {
+		let auxCurrentSpeciesList = []
+		props.familiesList.map((family) => {			
+			if(family.name.includes(event.target.value)) {
+				auxCurrentSpeciesList = props.currentSpeciesList.filter((specie) => specie.familyKey == family.key)
+			}
+		})
+		if(auxCurrentSpeciesList.length == 0) {
+			props.setCurrentSpeciesListIsEmpty(true)
+			props.setCurrentSpeciesList(props.speciesList)
+		} else {
+			props.setCurrentSpeciesListIsEmpty(false)
+			props.setCurrentSpeciesList(auxCurrentSpeciesList)
+		}		
+	}
+
+	return (
+		<React.Fragment>
+			<TableRow>
+				<TableCell component="th" scope="row">
+					<TextField
+						fullWidth id="specieNameFilterParam" name="specieNameFilterParam"
+						onChange={handleSpecieNameChange} className={classes.input}
+						label="Filtrar pela espécie" variant="outlined"
+					/>
+				</TableCell>
+				<TableCell>
+				<TextField
+						fullWidth id="familyNameFilterParam" name="familyNameFilterParam"
+						onChange={handleFamilyNameChangeName} className={classes.input}
+						label="Filtrar pela família" variant="outlined"
+					/>
+				</TableCell>
+				<TableCell></TableCell>
+			</TableRow>
+		</React.Fragment>
+	)
+}
+
+function DataRow(props) {
 	const { specie } = props;
 	const [open, setOpen] = React.useState(false);
 	const classes = useRowStyles();
 
 	return (
 		<React.Fragment>
-			<TableRow className={classes.root}>
+			<TableRow>
 				<TableCell component="th" scope="row">
 					{specie.scientificName}
 				</TableCell>
-				<TableCell>{specie.familyName}</TableCell> 
-				<TableCell>
+				<TableCell component="th" scope="row">
+					{specie.familyName}
+				</TableCell> 
+				<TableCell component="th" scope="row">
 					<Grid container direction="row">            
 						<IconButton aria-label="descrição" size="small" onClick={() => setOpen(!open)}>
 							<Description style={{color: "#3975B8"}}/>
@@ -89,7 +163,7 @@ function Row(props) {
 						<IconButton aria-label="excluir" size="small" onClick={() => setOpen(!open)}>
 							<Delete color="error"/>
 						</IconButton>
-					</Grid>          
+					</Grid>
 				</TableCell>
 			</TableRow>
 			<TableRow>
