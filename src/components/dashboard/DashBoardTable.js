@@ -173,10 +173,10 @@ function DataRow(props) {
 					<Collapse in={open} timeout="auto" unmountOnExit>
 						<Box margin={1}>
 							<Typography variant="body" gutterBottom component="div">
-								{specie.description}
+								{specie.descriptions[0].description}
 							</Typography>
 							<Typography variant="caption" style={{textAlign: 'justify', fontWeight: 'bold'}}>
-								{specie.reference}
+								{specie.descriptions[0].reference}
 							</Typography>
 						</Box>
 					</Collapse>

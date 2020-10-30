@@ -51,13 +51,13 @@ function SingleResult(props) {
       />
       <CardContent style={{width: '100%'}}>                          
         <Typography variant="body1" component="p" style={{textAlign: 'justify'}}>
-          {props.specie.description}
+          {props.specie.descriptions[0].description}
         </Typography>
         
       </CardContent>
       <CardActions>
         <Typography variant="caption" style={{textAlign: 'justify', fontWeight: 'bold'}}>
-          {props.specie.reference}
+          {props.specie.descriptions[0].reference}
         </Typography>
       </CardActions>
     </Card>

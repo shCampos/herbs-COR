@@ -18,7 +18,7 @@ import {
   ThemeProvider,
   Typography } from '@material-ui/core'
 import { Add, Brightness7, ExpandMore, GitHub, Search, } from '@material-ui/icons'
-
+import { Alert, AlertTitle } from '@material-ui/lab';
 import { 
   getAllFamilies,
   getAllSpecies,
@@ -149,6 +149,14 @@ export default function App() {
       <Typography variant="h6" className={classes.siteDescription}>
         apenas um site para ajudar na identificação de espécies das Iniciações Científicas do Herbário-COR
       </Typography>
+
+      <Alert variant="outlined" severity="warning" style={{marginBottom: '10px'}}>
+        <AlertTitle><strong>O site está em processo de atualização!</strong></AlertTitle>
+        Calma, a gente sabe que o site tá feio e que várias coisas não funcionam, <br/>
+        mas relaxa que quando os professores pararem de passar tarefa, o programador <br/>
+        vai deixar tudo funcionando ;)
+      </Alert>
+        
       <div style={{width: 'fit-content'}}>
         <Accordion expanded={expanded === 'panel1'} onChange={handlePanelChange('panel1')}>
           <AccordionSummary expandIcon={<ExpandMore />} aria-controls="panel1a-content" id="panel1a-header" className={classes.acordionHeader}>
