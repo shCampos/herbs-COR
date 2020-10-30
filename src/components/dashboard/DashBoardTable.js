@@ -63,7 +63,7 @@ export default function DashboardTable(props) {
 							const family = props.familiesList.filter((family)=>family.key === specie.familyKey)
 							return (                
 								<DataRow
-								specie={{...specie, familyName: family[0].name}}/>
+								specie={{...specie, familyName: family[0].scientificName}}/>
 							)
 						})}
 					</TableBody>

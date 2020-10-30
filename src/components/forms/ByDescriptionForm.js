@@ -38,7 +38,7 @@ export default function ByDescriptionForm(props) {
         }}
         options={props.familiesList}
         groupBy={(option) => option.firstLetter}
-        getOptionLabel={(option) => option.name}
+        getOptionLabel={(option) => option.scientificName}
         renderInput={(params) => <TextField {...params} label="Família" variant="outlined" />}
       />
 

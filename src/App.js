@@ -86,11 +86,11 @@ export default function App() {
       if(typeof dataFromFirebase === 'undefined' || dataFromFirebase === null) {
         setFamiliesList([])
       } else {
-        const auxFamiliesList = Object.entries(dataFromFirebase).map((fam) => typeof fam[1].name !== 'undefined'&&{key: fam[0], ...fam[1]})
+        const auxFamiliesList = Object.entries(dataFromFirebase).map((fam) => typeof fam[1].scientificName !== 'undefined'&&{key: fam[0], ...fam[1]})
         const withFirstLetterFamiliesList = auxFamiliesList.map((fam) => {
           return {
             ...fam,
-            firstLetter: fam.name[0].toUpperCase()
+            firstLetter: fam.scientificName[0].toUpperCase()
           }
         })
         const sortedFamiliesList = withFirstLetterFamiliesList.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))
@@ -180,7 +180,7 @@ export default function App() {
                     <Select labelId="queryItemSelectLabel" id="queryItemSelect" value={queryItem}
                       onChange={handleChangeQueryItemSelect} className={classes.input}>
                       <MenuItem value={'specie'} selected>Espécie</MenuItem>
-                      <MenuItem value={'genre'}>Gênero</MenuItem>
+                      <MenuItem value={'genus'}>Gênero</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
@@ -200,7 +200,9 @@ export default function App() {
               {(speciesList.length > 0 && familiesList.length > 0 && queryResultList.length === 0)&&(
                 <Grid item>
                   {(postOrGetSwitch)?(
-                    <AddForm queryItem={queryItem}/>
+                    <AddForm
+                      queryItem={queryItem}
+                    />
                   ):(
                     <SearchForm
                       queryType={queryType}
