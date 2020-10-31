@@ -18,7 +18,7 @@ import {
   ThemeProvider,
   Typography } from '@material-ui/core'
 import { Add, Brightness7, ExpandMore, GitHub, Search, } from '@material-ui/icons'
-import { Alert, AlertTitle } from '@material-ui/lab';
+import { Alert, AlertTitle, ToggleButton, ToggleButtonGroup, } from '@material-ui/lab';
 import { 
   getAllFamilies,
   getAllSpecies,
@@ -75,9 +75,9 @@ export default function App() {
     clearQueryResultList()
   }
 
-  const [postOrGetSwitch, setPostOrGetSwitch] = useState(false)
-  const handlePostOrGetSwitchChange = (event) => {
-    setPostOrGetSwitch(!postOrGetSwitch)
+  const [postOrGetSwitch, setPostOrGetSwitch] = useState('pesquisar')
+  const handlePostOrGetSwitchChange = (event, newValue) => {
+    setPostOrGetSwitch(newValue)
   }
 
   const [familiesList, setFamiliesList] = useState([])
@@ -159,7 +159,17 @@ export default function App() {
         
       <div style={{width: 'fit-content'}}>
         <Accordion expanded={expanded === 'panel1'} onChange={handlePanelChange('panel1')}>
-          <AccordionSummary expandIcon={<ExpandMore />} aria-controls="panel1a-content" id="panel1a-header" className={classes.acordionHeader}>
+          <AccordionSummary expandIcon={<ExpandMore />} className={classes.acordionHeader}>
+            <Typography className={classes.heading} variant="overline">
+              Sobre
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails fullWidth className={classes.acordionBody}>
+            sobre
+          </AccordionDetails>
+        </Accordion>
+        <Accordion expanded={expanded === 'panel2'} onChange={handlePanelChange('panel2')}>
+          <AccordionSummary expandIcon={<ExpandMore />} className={classes.acordionHeader}>
             <Typography className={classes.heading} variant="overline">
               Ações rápidas
             </Typography>
@@ -167,24 +177,19 @@ export default function App() {
           <AccordionDetails fullWidth className={classes.acordionBody}>
             <Grid container direction="column">
               <Grid container direction="row" justify="center" alignItems="center" spacing={2}>
-                <Grid item xs={4}>
-                  <Typography component="div">
-                    <Grid component="label" container alignItems="center" spacing={0}>
-                      <Grid item>
-                        <Search/>
-                      </Grid>
-                      <Grid item>
-                        <Switch onChange={handlePostOrGetSwitchChange} name="postOrGetSwitch" />
-                      </Grid>
-                      <Grid item>
-                        <Add/>
-                      </Grid>
-                    </Grid>
-                  </Typography>
+                <Grid item xs={2}>
+                  <ToggleButtonGroup value={postOrGetSwitch} exclusive onChange={handlePostOrGetSwitchChange}>
+                    <ToggleButton value="pesquisar" aria-label="pesquisar">
+                      <Search  color="primary"/>
+                    </ToggleButton>
+                    <ToggleButton value="adicionar" aria-label="adicionar">
+                      <Add color="primary"/>
+                    </ToggleButton>
+                  </ToggleButtonGroup>
                 </Grid>
-                <Grid item xs={4}>
+                <Grid item xs={5}>
                   <FormControl variant="outlined" className={classes.formControl}>
-                    <InputLabel id="queryItemSelectLabel">O que {(postOrGetSwitch)?'adicionar':'pesquisar'}?</InputLabel>
+                    <InputLabel id="queryItemSelectLabel">O que {postOrGetSwitch}?</InputLabel>
                     <Select labelId="queryItemSelectLabel" id="queryItemSelect" value={queryItem}
                       onChange={handleChangeQueryItemSelect} className={classes.input}>
                       <MenuItem value={'specie'} selected>Espécie</MenuItem>
@@ -192,8 +197,8 @@ export default function App() {
                     </Select>
                   </FormControl>
                 </Grid>
-                {(!postOrGetSwitch)&&(
-                  <Grid item xs={4}>                  
+                {(postOrGetSwitch=='pesquisar')&&(
+                  <Grid item xs={5}>                  
                     <FormControl variant="outlined" className={classes.formControl}>
                       <InputLabel id="queryTypeSelectLabel">Como pesquisar?</InputLabel>
                       <Select labelId="queryTypeSelectLabel" id="queryTypeSelect" value={queryType}
@@ -207,7 +212,7 @@ export default function App() {
               </Grid>
               {(speciesList.length > 0 && familiesList.length > 0 && queryResultList.length === 0)&&(
                 <Grid item>
-                  {(postOrGetSwitch)?(
+                  {(postOrGetSwitch=='adicionar')?(
                     <AddForm
                       queryItem={queryItem}
                     />
@@ -234,8 +239,8 @@ export default function App() {
             </Grid>
           </AccordionDetails>
         </Accordion>
-        <Accordion expanded={expanded === 'panel2'} onChange={handlePanelChange('panel2')}>
-          <AccordionSummary expandIcon={<ExpandMore />} aria-controls="panel1a-content" id="panel1a-header" className={classes.acordionHeader}>
+        <Accordion expanded={expanded === 'panel3'} onChange={handlePanelChange('panel3')}>
+          <AccordionSummary expandIcon={<ExpandMore />} className={classes.acordionHeader}>
             <Typography className={classes.heading} variant="overline">
               Dashboard completo
             </Typography>

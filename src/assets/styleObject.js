@@ -45,6 +45,8 @@ export const styleObject = makeStyles((theme) => ({
     color: '#fff'
   },
   formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
     width: '100%',
   },
   input: {

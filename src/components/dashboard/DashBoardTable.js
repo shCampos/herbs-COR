@@ -105,7 +105,7 @@ function FilterRow(props) {
 	const handleFamilyNameChangeName = (event) => {
 		let auxCurrentSpeciesList = []
 		props.familiesList.map((family) => {			
-			if(family.name.includes(event.target.value)) {
+			if(family.scientificName.includes(event.target.value)) {
 				auxCurrentSpeciesList = props.currentSpeciesList.filter((specie) => specie.familyKey == family.key)
 			}
 		})
