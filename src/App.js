@@ -15,6 +15,7 @@ import {
   MenuItem,
   Select,
   ThemeProvider,
+  Tooltip,
   Typography } from '@material-ui/core'
 import { Add, Brightness7, ExpandMore, GitHub, Search, } from '@material-ui/icons'
 import { Alert, AlertTitle, ToggleButton, ToggleButtonGroup, } from '@material-ui/lab';
@@ -178,11 +179,15 @@ export default function App() {
               <Grid container direction="row" justify="center" alignItems="center" spacing={2}>
                 <Grid item xs={2}>
                   <ToggleButtonGroup value={postOrGetSwitch} exclusive onChange={handlePostOrGetSwitchChange}>
-                    <ToggleButton value="pesquisar" aria-label="pesquisar">
-                      <Search  color="primary"/>
+                    <ToggleButton value="pesquisar">
+                      <Tooltip title="Pesquisar">
+                        <Search color="primary"/>
+                      </Tooltip>                      
                     </ToggleButton>
-                    <ToggleButton value="adicionar" aria-label="adicionar">
-                      <Add color="primary"/>
+                    <ToggleButton value="adicionar">
+                      <Tooltip title="Adicionar">
+                        <Add color="primary"/>
+                      </Tooltip>                      
                     </ToggleButton>
                   </ToggleButtonGroup>
                 </Grid>
