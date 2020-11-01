@@ -27,9 +27,10 @@ import {
 import { themeObject } from './assets/themeObject.js'
 import { styleObject } from './assets/styleObject.js'
 
+import About from './components/about'
 import { SearchForm, AddForm } from './components/forms'
-import Dashboard from './components/dashboard'
 import QueryResults from './components/query-results'
+import Dashboard from './components/dashboard'
 
 const useDarkMode = () => {
   const [theme, setTheme] = useState(themeObject)
@@ -157,7 +158,7 @@ export default function App() {
         vai deixar tudo funcionando ;)
       </Alert>
         
-      <div style={{width: 'fit-content'}}>
+      <div style={{width: '684px'}}>
         <Accordion expanded={expanded === 'panel1'} onChange={handlePanelChange('panel1')}>
           <AccordionSummary expandIcon={<ExpandMore />} className={classes.acordionHeader}>
             <Typography className={classes.heading} variant="overline">
@@ -165,7 +166,7 @@ export default function App() {
             </Typography>
           </AccordionSummary>
           <AccordionDetails fullWidth className={classes.acordionBody}>
-            sobre
+            <About />
           </AccordionDetails>
         </Accordion>
         <Accordion expanded={expanded === 'panel2'} onChange={handlePanelChange('panel2')}>
@@ -176,7 +177,7 @@ export default function App() {
           </AccordionSummary>
           <AccordionDetails fullWidth className={classes.acordionBody}>
             <Grid container direction="column">
-              <Grid container direction="row" justify="center" alignItems="center" spacing={2}>
+              <Grid container direction="row" justify="flex-start" alignItems="center" spacing={1}>
                 <Grid item xs={2}>
                   <ToggleButtonGroup value={postOrGetSwitch} exclusive onChange={handlePostOrGetSwitchChange}>
                     <ToggleButton value="pesquisar">
@@ -201,18 +202,17 @@ export default function App() {
                     </Select>
                   </FormControl>
                 </Grid>
-                {(postOrGetSwitch=='pesquisar')&&(
-                  <Grid item xs={5}>                  
-                    <FormControl variant="outlined" className={classes.formControl}>
-                      <InputLabel id="queryTypeSelectLabel">Como pesquisar?</InputLabel>
-                      <Select labelId="queryTypeSelectLabel" id="queryTypeSelect" value={queryType}
-                        onChange={handleChangeQueryTypeSelect} className={classes.input}>
-                        <MenuItem value={'name'} selected>Pelo nome</MenuItem>
-                        <MenuItem value={'description'}>Pela descrição</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                )}
+                <Grid item xs={5}>
+                  <FormControl variant="outlined" className={classes.formControl}>
+                    <InputLabel id="queryTypeSelectLabel">Como pesquisar?</InputLabel>
+                    <Select labelId="queryTypeSelectLabel" id="queryTypeSelect" value={queryType}
+                      onChange={handleChangeQueryTypeSelect} className={classes.input}
+                      disabled={(postOrGetSwitch=='pesquisar')?false:true}>
+                      <MenuItem value={'name'} selected>Pelo nome</MenuItem>
+                      <MenuItem value={'description'}>Pela descrição</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
               </Grid>
               {(speciesList.length > 0 && familiesList.length > 0 && queryResultList.length === 0)&&(
                 <Grid item>

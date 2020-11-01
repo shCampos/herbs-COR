@@ -11,6 +11,18 @@ function getWindowDimensions() {
 const { height, width } = getWindowDimensions()
 
 export const styleObject = makeStyles((theme) => ({
+  '@global': {
+    '*::-webkit-scrollbar': {
+      width: '0.4em',
+      height: '0.5em'
+    },
+    '*::-webkit-scrollbar-track': {
+      '-webkit-box-shadow': 'inset 0 0 6px rgba(0,0,0,0.00)'
+    },
+    '*::-webkit-scrollbar-thumb': {
+      backgroundColor: 'rgba(0,0,0,.1)',
+    }
+  },
   root: {
     flexGrow: 1,
     width: width,
@@ -44,9 +56,10 @@ export const styleObject = makeStyles((theme) => ({
     backgroundColor: theme.palette.text.secondary,
     color: '#fff'
   },
+  acordionBody: {
+    overflow: 'auto'
+  },
   formControl: {
-    margin: theme.spacing(1),
-    minWidth: 120,
     width: '100%',
   },
   input: {
@@ -62,7 +75,7 @@ export const styleObject = makeStyles((theme) => ({
     fontWeight: 'bold',
     color: '#fff',  
   },
-  porcentagem: {
+  avatar: {
     backgroundColor: '#3eb827'
   },
   listItemResult: {
@@ -70,6 +83,19 @@ export const styleObject = makeStyles((theme) => ({
   },
   tableDashboard: {
     width: '100%',
-    maxHeight: 440
+    maxHeight: 440,
+  },
+  link: {
+    color: '#3975B8',
+    textDecoration: 'none',
+    fontWeight: 'bold'
+  },
+  list: {
+    width: '100%',
+    paddingTop: 0,
+    backgroundColor: theme.palette.background.paper,
+  },
+  listItem: {
+    padding: 0
   }
 }))

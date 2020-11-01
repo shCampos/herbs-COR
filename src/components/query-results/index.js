@@ -78,7 +78,7 @@ function MultipleResults(props) {
             <div className={classes.listItemResult}>
               <ListItem style={{width: '100%'}}>
                 <ListItemAvatar>
-                  <Avatar className={classes.porcentagem}>{specieRating}%</Avatar>
+                  <Avatar className={classes.avatar}>{specieRating}%</Avatar>
                 </ListItemAvatar>
                 <ListItemText
                   primary={<span><font style={{fontStyle: 'italic'}}>{specieName}</font> {specieAuthor}</span>}

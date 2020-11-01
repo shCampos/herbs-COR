@@ -85,14 +85,14 @@ export function AddForm(props) {
         )}
       </Grid> */}
       <Grid container direction="row" justify="center" alignItems="center" spacing={2}>
-        <Grid item>
+        <Grid item xs={5}>
           <TextField
             required id="itemFamily" name="itemFamily"
             onChange={handleAddFormChange} value={newItem.itemFamily}
             className={classes.input} label="Nome da família" variant="outlined"
           />
         </Grid>
-        <Grid item>
+        <Grid item xs={6}>
           <TextField
             required id="itemName" name="itemName"
             onChange={handleAddFormChange} value={newItem.itemName}
@@ -100,8 +100,8 @@ export function AddForm(props) {
             label={props.queryItem==='specie'?"Nome da espécie":"Nome do gênero"}
           />
         </Grid>
-        <Grid item>
-          <IconButton variant="contained" color="primary" onClick={searchNames} style={{width: 'min-content', height: 'min-content'}}>
+        <Grid item xs={1}>
+          <IconButton color="primary" onClick={searchNames} style={{width: 'min-content', height: 'min-content'}}>
             <Search/>
           </IconButton>
         </Grid>
