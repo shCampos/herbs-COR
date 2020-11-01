@@ -1,9 +1,8 @@
-import React, { useRef, useState } from 'react'
+import React, { useState } from 'react'
 import {
   Box,
   Collapse,
 	IconButton,
-	InputAdornment,
   Grid,
   Paper,
   Table,
@@ -17,7 +16,7 @@ import {
   Typography,
 } from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
-import { Delete, Description, Edit, FilterList } from '@material-ui/icons';
+import { Delete, Description, Edit } from '@material-ui/icons';
 
 import { styleObject } from '../../assets/styleObject.js'
 
@@ -88,33 +87,37 @@ function FilterRow(props) {
 
 	const handleSpecieNameChange = (event) => {
 		let auxCurrentSpeciesList = []
-		props.currentSpeciesList.map((specie) => {
-			if(specie.scientificName.includes(event.target.value)) {
-				auxCurrentSpeciesList.push(specie)
-			}
-		})
-		if(auxCurrentSpeciesList.length == 0) {
-			props.setCurrentSpeciesListIsEmpty(true)
+		if(event.target.value === '') {
 			props.setCurrentSpeciesList(props.speciesList)
 		} else {
-			props.setCurrentSpeciesListIsEmpty(false)
-			props.setCurrentSpeciesList(auxCurrentSpeciesList)
+			props.currentSpeciesList.map((specie) => specie.scientificName.includes(event.target.value)&&auxCurrentSpeciesList.push(specie))
+			if(auxCurrentSpeciesList.length === 0) {
+				props.setCurrentSpeciesListIsEmpty(true)
+				props.setCurrentSpeciesList(props.speciesList)
+			} else {
+				props.setCurrentSpeciesListIsEmpty(false)
+				props.setCurrentSpeciesList(auxCurrentSpeciesList)
+			}
 		}
 	}
 
 	const handleFamilyNameChangeName = (event) => {
 		let auxCurrentSpeciesList = []
-		props.familiesList.map((family) => {			
-			if(family.scientificName.includes(event.target.value)) {
-				auxCurrentSpeciesList = props.currentSpeciesList.filter((specie) => specie.familyKey == family.key)
-			}
-		})
-		if(auxCurrentSpeciesList.length == 0) {
-			props.setCurrentSpeciesListIsEmpty(true)
+		if(event.target.value === '') {
 			props.setCurrentSpeciesList(props.speciesList)
 		} else {
-			props.setCurrentSpeciesListIsEmpty(false)
-			props.setCurrentSpeciesList(auxCurrentSpeciesList)
+			props.familiesList.map((family) => {			
+				if(family.scientificName.includes(event.target.value)) {
+					auxCurrentSpeciesList = props.currentSpeciesList.filter((specie) => specie.familyKey === family.key)
+				}
+			})
+			if(auxCurrentSpeciesList.length === 0) {
+				props.setCurrentSpeciesListIsEmpty(true)
+				props.setCurrentSpeciesList(props.speciesList)
+			} else {
+				props.setCurrentSpeciesListIsEmpty(false)
+				props.setCurrentSpeciesList(auxCurrentSpeciesList)
+			}
 		}
 	}
 

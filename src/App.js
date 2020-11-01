@@ -14,7 +14,6 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  Switch,
   ThemeProvider,
   Typography } from '@material-ui/core'
 import { Add, Brightness7, ExpandMore, GitHub, Search, } from '@material-ui/icons'
