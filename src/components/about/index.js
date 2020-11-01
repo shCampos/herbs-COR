@@ -32,8 +32,6 @@ export default function About() {
                 <Typography component="span" variant="subtitle1">
                   O Farinaccio é um sistema para gerenciamento e pesquisa de descrições de espécies que estão sendo estudadas por
                   projetos de pesquisa do <a className={classes.link} href="https://cpan.ufms.br/ciencias-biologicas/herbario-cor/" target="_blank">Herbário COR</a>.
-                  Pretende-se com esse site facilitar e agilizar o desenvolvimento dos projetos de Iniciação Científica produzidor no
-                  <a className={classes.link} href="https://cpan.ufms.br/ciencias-biologicas/herbario-cor/" target="_blank"> Herbário COR</a>.
                 </Typography>
               </React.Fragment>
             }
