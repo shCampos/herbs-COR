@@ -30,7 +30,7 @@ export default function About() {
             secondary={
               <React.Fragment>
                 <Typography component="span" variant="subtitle1">
-                  O Farinaccio é um sistema para gerenciamento e pesquisa de descrições de espécies que estão sendo estudadas por
+                  O <strong style={{fontFamily: 'David Libre'}}>Farinaccio</strong> é um sistema para gerenciamento e pesquisa de descrições de espécies que estão sendo estudadas por
                   projetos de pesquisa do <a className={classes.link} href="https://cpan.ufms.br/ciencias-biologicas/herbario-cor/" target="_blank">Herbário COR</a>.
                 </Typography>
               </React.Fragment>
