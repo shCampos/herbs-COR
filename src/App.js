@@ -197,7 +197,8 @@ export default function App() {
                   <FormControl variant="outlined" className={classes.formControl}>
                     <InputLabel id="queryItemSelectLabel">O que {postOrGetSwitch}?</InputLabel>
                     <Select labelId="queryItemSelectLabel" id="queryItemSelect" value={queryItem}
-                      onChange={handleChangeQueryItemSelect} className={classes.input}>
+                      onChange={handleChangeQueryItemSelect} className={classes.input}
+                      disabled={(postOrGetSwitch==='pesquisar')?false:true}>
                       <MenuItem value={'specie'} selected>Espécie</MenuItem>
                       <MenuItem value={'genus'}>Gênero</MenuItem>
                     </Select>
@@ -208,7 +209,7 @@ export default function App() {
                     <InputLabel id="queryTypeSelectLabel">Como pesquisar?</InputLabel>
                     <Select labelId="queryTypeSelectLabel" id="queryTypeSelect" value={queryType}
                       onChange={handleChangeQueryTypeSelect} className={classes.input}
-                      disabled={(postOrGetSwitch=='pesquisar')?false:true}>
+                      disabled={(postOrGetSwitch==='pesquisar')?false:true}>
                       <MenuItem value={'name'} selected>Pelo nome</MenuItem>
                       <MenuItem value={'description'}>Pela descrição</MenuItem>
                     </Select>
@@ -219,7 +220,6 @@ export default function App() {
                 <Grid item>
                   {(postOrGetSwitch=='adicionar')?(
                     <AddForm
-                      queryItem={queryItem}
                       speciesList={speciesList}
                     />
                   ):(

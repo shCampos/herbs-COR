@@ -43,9 +43,10 @@ export function AddForm(props) {
   const [searchFlags, setSearchFlags] = useState({
     nameSearched: false,
     withoutAuthor: false,
-    specieFound: false,
+    specieInDb: false,
     willSearch: false,
     specieNotFoundInGBIF: false,
+    isSynonymous: false,
   })
 
   const [newItem, setNewItem] = useState({})
@@ -58,6 +59,13 @@ export function AddForm(props) {
     
     if(!/(\w+\s){2}.{1,}/.test(auxValues.itemName)) {
       setSearchFlags({withoutAuthor: true})
+    } else {
+      props.speciesList.map((specie) => {
+        if(compareTwoStrings(auxValues.itemName, specie.scientificName) > 0.9) {
+          setSearchFlags({specieInDb: true})
+          console.log(specie)
+        }
+      })
     }
   }
 
@@ -70,22 +78,18 @@ export function AddForm(props) {
     console.log('foi')
   }
 
-  const [queryResponse, setQueryResponse] = useState({})
+  //const [queryResponse, setQueryResponse] = useState({})
   const searchNames = () => {
-    props.speciesList.map((specie) => {
-      if(compareTwoStrings(newItem.itemName, specie.scientificName) > 0.9) {
-        setSearchFlags({specieFound: true})
-      }
-    })
-    if(!searchFlags.specieFound) {
+    if(!searchFlags.specieInDb) {
       setSearchFlags({willSearch: true})
       searchSpecieName(newItem.itemName, (response) => {
         if(response.usageKey === 6) {
           setSearchFlags({specieNotFoundInGBIF: true})
+        } else if (response.synonym) {
+          setSearchFlags({isSynonymous: true})
         } else {
-          setSearchFlags({willSearch: false})
-          setNewItem({itemName: response.scientificName})
-          setSearchFlags({nameSearched: true})
+          setSearchFlags({willSearch: false, nameSearched: true})
+          setNewItem({itemName: response.scientificName, gbifKey: response.usageKey})
         }
       })
     }
@@ -103,9 +107,6 @@ export function AddForm(props) {
         {(flagAlert.missingParams)&&(
           <Alert variant="filled" style={{width: '100%'}} severity="error">A família ou o gênero está faltando.</Alert>
         )}
-        {(flagAlert.specieInDb)&&(
-          <Alert variant="filled" style={{width: '100%'}} severity="warning">Essa espécie já foi inclusa no banco de dados.</Alert>
-        )}
       </Grid> */}
       <Grid container style={{marginBottom: '10px'}}>
         {(searchFlags.specieNotFoundInGBIF)&&(
@@ -114,7 +115,7 @@ export function AddForm(props) {
         {(searchFlags.withoutAuthor)&&(
           <Alert variant="outlined" style={{width: '100%'}} severity="warning">Coloque o autor.</Alert>
         )}
-        {(searchFlags.specieFound)&&(
+        {(searchFlags.specieInDb)&&(
           <Alert variant="outlined" style={{width: '100%'}} severity="info">
             Essa espécie já foi inclusa no banco de dados, mas você pode adicionar uma nova descrição.
           </Alert>
@@ -125,6 +126,11 @@ export function AddForm(props) {
             <LinearProgress color="secondary"/> 
           </Alert>
         )}
+        {(searchFlags.isSynonymous)&&(
+          <Alert variant="outlined" style={{width: '100%'}} severity="warning">
+            Você digitou um sinônimo. Dê uma olhada em <a href="https://www.tropicos.org/" target="_blank">Trópicos</a> e use o nome aceito.
+          </Alert>
+        )}
       </Grid>
       <Grid container direction="row" justify="center" alignItems="center" spacing={1}>
         <Grid item xs={11}>
@@ -132,11 +138,11 @@ export function AddForm(props) {
             required id="itemName" name="itemName"
             onChange={handleAddFormChange} value={newItem.itemName}
             className={classes.input} variant="outlined"
-            label={props.queryItem==='specie'?"Nome da espécie":"Nome do gênero"}
+            label="Nome científico"
           />
         </Grid>
         <Grid item xs={1}>
-          <Tooltip title="Pesquisar a espécie">
+          <Tooltip title="Pesquisar o nome correto">
             <IconButton color="primary" onClick={searchNames} style={{width: 'min-content', height: 'min-content'}}>
               <Search/>
             </IconButton>
