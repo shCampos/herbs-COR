@@ -3,12 +3,16 @@ import {
   Button,
   IconButton,
   Grid,
+  LinearProgress,
   TextField,
+  Tooltip,
 } from '@material-ui/core'
+import { Alert, AlertTitle } from '@material-ui/lab'
 import { Search } from '@material-ui/icons'
 
 import { styleObject } from '../../assets/styleObject.js'
-import { searchFamilyAndSpecieNames } from '../../utils/gbif.js'
+import { compareTwoStrings } from 'string-similarity'
+import { searchSpecieName } from '../../utils/gbif.js'
 
 import ByDescriptionForm from './ByDescriptionForm.js'
 import ByNameForm from './ByNameForm.js'
@@ -36,12 +40,25 @@ export function SearchForm(props) {
 
 export function AddForm(props) {
   const classes = styleObject()
+  const [searchFlags, setSearchFlags] = useState({
+    nameSearched: false,
+    withoutAuthor: false,
+    specieFound: false,
+    willSearch: false,
+    specieNotFoundInGBIF: false,
+  })
 
   const [newItem, setNewItem] = useState({})
   const handleAddFormChange = (event) => {
+    setSearchFlags({nameSearched: false, withoutAuthor: false})
+
     const auxValues = { ...newItem }
     auxValues[event.target.name] = event.target.value
     setNewItem(auxValues)
+    
+    if(!/(\w+\s){2}.{1,}/.test(auxValues.itemName)) {
+      setSearchFlags({withoutAuthor: true})
+    }
   }
 
   const handleFormSubmit = callback => event => {
@@ -53,16 +70,25 @@ export function AddForm(props) {
     console.log('foi')
   }
 
-  const [searchFlags, setSearchFlags] = useState({
-    nameSearched: false
-  })
-
+  const [queryResponse, setQueryResponse] = useState({})
   const searchNames = () => {
-    console.log('newItem', newItem)
-    //searchFamilyAndSpecieNames(newItem.itemFamily, newItem.itemName)
-    //search on bd
-      //search on gbif
-    setSearchFlags({nameSearched: true})
+    props.speciesList.map((specie) => {
+      if(compareTwoStrings(newItem.itemName, specie.scientificName) > 0.9) {
+        setSearchFlags({specieFound: true})
+      }
+    })
+    if(!searchFlags.specieFound) {
+      setSearchFlags({willSearch: true})
+      searchSpecieName(newItem.itemName, (response) => {
+        if(response.usageKey === 6) {
+          setSearchFlags({specieNotFoundInGBIF: true})
+        } else {
+          setSearchFlags({willSearch: false})
+          setNewItem({itemName: response.scientificName})
+          setSearchFlags({nameSearched: true})
+        }
+      })
+    }
   }
   
   return (
@@ -77,22 +103,31 @@ export function AddForm(props) {
         {(flagAlert.missingParams)&&(
           <Alert variant="filled" style={{width: '100%'}} severity="error">A família ou o gênero está faltando.</Alert>
         )}
-        {(flagAlert.withoutAuthor)&&(
-          <Alert variant="filled" style={{width: '100%'}} severity="warning">Coloque o autor.</Alert>
-        )}
         {(flagAlert.specieInDb)&&(
           <Alert variant="filled" style={{width: '100%'}} severity="warning">Essa espécie já foi inclusa no banco de dados.</Alert>
         )}
       </Grid> */}
-      <Grid container direction="row" justify="center" alignItems="center" spacing={2}>
-        <Grid item xs={5}>
-          <TextField
-            required id="itemFamily" name="itemFamily"
-            onChange={handleAddFormChange} value={newItem.itemFamily}
-            className={classes.input} label="Nome da família" variant="outlined"
-          />
-        </Grid>
-        <Grid item xs={6}>
+      <Grid container style={{marginBottom: '10px'}}>
+        {(searchFlags.specieNotFoundInGBIF)&&(
+          <Alert variant="outlined" style={{width: '100%'}} severity="error">Espécie não existente. Digite o nome corretamente ou use o nome aceito.</Alert>
+        )}
+        {(searchFlags.withoutAuthor)&&(
+          <Alert variant="outlined" style={{width: '100%'}} severity="warning">Coloque o autor.</Alert>
+        )}
+        {(searchFlags.specieFound)&&(
+          <Alert variant="outlined" style={{width: '100%'}} severity="info">
+            Essa espécie já foi inclusa no banco de dados, mas você pode adicionar uma nova descrição.
+          </Alert>
+        )}
+        {(searchFlags.willSearch)&&(
+          <Alert variant="outlined" style={{width: '100%'}} severity="info">
+            <AlertTitle>Pesquisando espécie no GBIF...</AlertTitle>
+            <LinearProgress color="secondary"/> 
+          </Alert>
+        )}
+      </Grid>
+      <Grid container direction="row" justify="center" alignItems="center" spacing={1}>
+        <Grid item xs={11}>
           <TextField
             required id="itemName" name="itemName"
             onChange={handleAddFormChange} value={newItem.itemName}
@@ -101,9 +136,11 @@ export function AddForm(props) {
           />
         </Grid>
         <Grid item xs={1}>
-          <IconButton color="primary" onClick={searchNames} style={{width: 'min-content', height: 'min-content'}}>
-            <Search/>
-          </IconButton>
+          <Tooltip title="Pesquisar a espécie">
+            <IconButton color="primary" onClick={searchNames} style={{width: 'min-content', height: 'min-content'}}>
+              <Search/>
+            </IconButton>
+          </Tooltip>
         </Grid>
       </Grid>
 

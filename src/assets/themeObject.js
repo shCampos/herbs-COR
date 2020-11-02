@@ -4,7 +4,7 @@ export const themeObject = {
       main: '#3eb827',
     },
     secondary: {
-      main: '#13380C',
+      main: '#3975B8',
     },
     error: {
       main: '#B82114'

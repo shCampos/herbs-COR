@@ -1,9 +1,9 @@
-export function searchFamilyAndSpecieNames(familyName, itemName) {
-  fetch(`https://api.gbif.org/v1/species/match?verbose=false&kingdom=Plantae&name=${itemName}`)
+export async function searchSpecieName(itemName, setQueryResponse) {
+  await fetch(`https://api.gbif.org/v1/species/match?verbose=false&kingdom=Plantae&name=${itemName}`)
   .then(res => res.json())
   .then(
     (result) => {
-      console.log(result)
+      setQueryResponse(result)
     },
     (error) => {
       console.log('error', error)

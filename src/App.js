@@ -78,6 +78,7 @@ export default function App() {
 
   const [postOrGetSwitch, setPostOrGetSwitch] = useState('pesquisar')
   const handlePostOrGetSwitchChange = (event, newValue) => {
+    clearQueryResultList()
     setPostOrGetSwitch(newValue)
   }
 
@@ -219,6 +220,7 @@ export default function App() {
                   {(postOrGetSwitch=='adicionar')?(
                     <AddForm
                       queryItem={queryItem}
+                      speciesList={speciesList}
                     />
                   ):(
                     <SearchForm
