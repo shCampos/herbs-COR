@@ -40,14 +40,7 @@ export function SearchForm(props) {
 
 export function AddForm(props) {
   const classes = styleObject()
-  const [searchFlags, setSearchFlags] = useState({
-    nameSearched: false,
-    withoutAuthor: false,
-    specieInDb: false,
-    willSearch: false,
-    specieNotFoundInGBIF: false,
-    isSynonymous: false,
-  })
+  const [searchFlags, setSearchFlags] = useState({})
 
   const [newItem, setNewItem] = useState({})
   const handleAddFormChange = (event) => {
@@ -97,23 +90,16 @@ export function AddForm(props) {
   
   return (
     <form onSubmit={handleFormSubmit(addFormSubmit)} autoComplete="off">
-      {/* <Grid container fullWidth style={{marginBottom: '10px'}}>
-        {(flagAlert.sucessSendDescription)&&(
-          <Alert variant="filled" style={{width: '100%'}} severity="success">Descrição enviada ao banco de dados.</Alert>
-        )}
-        {(flagAlert.errorSendDescription)&&(
-          <Alert variant="filled" style={{width: '100%'}} severity="error">Erro em enviar descrição ao banco de dados.</Alert>
-        )}
-        {(flagAlert.missingParams)&&(
-          <Alert variant="filled" style={{width: '100%'}} severity="error">A família ou o gênero está faltando.</Alert>
-        )}
-      </Grid> */}
       <Grid container style={{marginBottom: '10px'}}>
         {(searchFlags.specieNotFoundInGBIF)&&(
-          <Alert variant="outlined" style={{width: '100%'}} severity="error">Espécie não existente. Digite o nome corretamente ou use o nome aceito.</Alert>
+          <Alert variant="outlined" style={{width: '100%'}} severity="error">
+            Espécie não existente. Digite o nome corretamente ou use o nome aceito.
+          </Alert>
         )}
         {(searchFlags.withoutAuthor)&&(
-          <Alert variant="outlined" style={{width: '100%'}} severity="warning">Coloque o autor.</Alert>
+          <Alert variant="outlined" style={{width: '100%'}} severity="warning">
+            A pesquisa funcionará melhor se você colocar a autoridade.
+          </Alert>
         )}
         {(searchFlags.specieInDb)&&(
           <Alert variant="outlined" style={{width: '100%'}} severity="info">
@@ -128,7 +114,17 @@ export function AddForm(props) {
         )}
         {(searchFlags.isSynonymous)&&(
           <Alert variant="outlined" style={{width: '100%'}} severity="warning">
-            Você digitou um sinônimo. Dê uma olhada em <a href="https://www.tropicos.org/" target="_blank">Trópicos</a> e use o nome aceito.
+            Você digitou um sinônimo. Dê uma olhada em <a href="https://www.tropicos.org/" target="_blank" className={classes.link}>Trópicos</a> e use o nome aceito.
+          </Alert>
+        )}
+        {(searchFlags.sucessSendDescription)&&(
+          <Alert variant="filled" style={{width: '100%'}} severity="success">
+            Descrição enviada ao banco de dados.
+          </Alert>
+        )}
+        {(searchFlags.errorSendDescription)&&(
+          <Alert variant="filled" style={{width: '100%'}} severity="error">
+            Erro em enviar descrição ao banco de dados.
           </Alert>
         )}
       </Grid>
