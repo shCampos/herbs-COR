@@ -43,15 +43,15 @@ export function AddForm() {
   const classes = styleObject()
   const [searchFlags, setSearchFlags] = useState({})
 
-  const [commsDbFlag, setCommsDbFlag] = useState('')
+  const [commsDbFlag, setCommsDbFlag] = useState({})
   useEffect(() => {
-    if(commsDbFlag == 'success') {
-      setSearchFlags({sucessSendDescription: true})
-      setTimeout(() => setSearchFlags({sucessSendDescription: false}), 8000)
+    if(commsDbFlag.situation == 'success') {
+      setSearchFlags({firebaseFeedback: true})
+      setTimeout(() => setSearchFlags({firebaseFeedback: false}), 8000)
     }
-    if(commsDbFlag == 'error') {
-      setSearchFlags({errorSendDescription: true})
-      setTimeout(() => setSearchFlags({errorSendDescription: false}), 8000)
+    if(commsDbFlag.situation == 'error') {
+      setSearchFlags({firebaseFeedback: true})
+      setTimeout(() => setSearchFlags({firebaseFeedback: false}), 8000)
     }
   }, [commsDbFlag])
 
@@ -134,21 +134,6 @@ export function AddForm() {
     })
   }, [newItem])
 
-  // const searchInFirebase = async () => {
-  //   await getItemByName(newItem.databasePath, newItem.scientificName, (dataFromFirebase) => {
-  //     console.log('dataFromFirebase'. dataFromFirebase)
-  //     if(dataFromFirebase === null || dataFromFirebase === undefined) {
-  //       console.log('entrou no IF')
-  //       setSearchFlags({...searchFlags, specieInDb: false, nameSearched: true})
-  //     } else {
-  //       console.log('entrou no else')
-  //       const firebaseKey = Object.keys(dataFromFirebase)
-  //       setNewItem({...newItem, firebaseKey: firebaseKey[0]})
-  //       setSearchFlags({...searchFlags, specieInDb: true, nameSearched: true})
-  //     }
-  //   })
-  // }
-
   const handleFormSubmit = callback => event => {
     event.preventDefault()
     callback()
@@ -160,9 +145,18 @@ export function AddForm() {
         description: newItem.itemDescription,
         reference: newItem.itemReference
       })
+      .then(() => setCommsDbFlag({
+        situation: 'success',
+        alertTitle: 'Descrição enviada para o banco de dados.'
+      }))
+      .catch((err) => setCommsDbFlag({
+        situation: 'error',
+        alertTitle: 'Ocorreu um erro.',
+        alertText: err.message
+      }))
     } else {
-      sendNewItemToDB(newItem, (flag) => {
-        setCommsDbFlag(flag)
+      sendNewItemToDB(newItem, (feedback) => {
+        setCommsDbFlag(feedback)
       })
     }
   }
@@ -196,14 +190,10 @@ export function AddForm() {
             Você digitou um sinônimo. Dê uma olhada em <a href="https://www.tropicos.org/" target="_blank" className={classes.link}>Trópicos</a> e use o nome aceito.
           </Alert>
         )}
-        {(searchFlags.sucessSendDescription)&&(
-          <Alert variant="filled" style={{width: '100%'}} severity="success">
-            <AlertTitle>Dados enviados.</AlertTitle>            
-          </Alert>
-        )}
-        {(searchFlags.errorSendDescription)&&(
-          <Alert variant="filled" style={{width: '100%'}} severity="error">
-            Erro em enviar descrição ao banco de dados.
+        {(searchFlags.firebaseFeedback)&&(
+          <Alert variant="outlined" style={{width: '100%'}} severity={commsDbFlag.situation}>
+            <AlertTitle>{commsDbFlag.alertTitle}</AlertTitle>
+            {(commsDbFlag.alertText)&&(commsDbFlag.alertText)}
           </Alert>
         )}
       </Grid>

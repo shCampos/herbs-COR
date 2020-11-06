@@ -1,15 +1,14 @@
 import {
   getItemKeyByGBIFKey,
   postNewItem,
-  postOtherDescription,
 } from './firebase.js'
 import { searchByName } from './gbif.js'
 
 export function sendNewItemToDB(newItem, setCommsDbFlag) {
-  console.log('ta no metodo sendNewItemToDB')
+  let familyKey = null,
+      genusKey = null
 
   const checkFamily = async () => {
-    let familyKey = null
     await getItemKeyByGBIFKey('families', newItem.familyGBIFKey, (response) => {
       if(response !== null) {
         familyKey = response
@@ -19,7 +18,6 @@ export function sendNewItemToDB(newItem, setCommsDbFlag) {
   }
 
   const checkGenus = async () => {
-    let genusKey = null
     await getItemKeyByGBIFKey('genera', newItem.genusGBIFKey, (response) => {
       if(response !== null) {
         genusKey = response
@@ -28,85 +26,103 @@ export function sendNewItemToDB(newItem, setCommsDbFlag) {
     return genusKey
   }
 
-  const isFamily = async () => {
-    await postNewItem('families', newItem)
-    .then(() => setCommsDbFlag('success'))
-    .catch((err) => {
-      console.log(err)
-      setCommsDbFlag('error')
-    })
-  } 
-
-  const isGenus = async () => {
-    let familyKey = await checkFamily()
-    if(familyKey === null) {
-      await searchByName(newItem.familyName, async (gbifResponse) => {
-        await postNewItem('families', {
-          gbifKey: gbifResponse.usageKey,
-          scientificName: gbifResponse.scientificName
-        })
-        .then(async () => {
-          console.log('familia enviada')
-          familyKey = await checkFamily()
-        })
-        .catch((err) => {
-          console.log(err)
-          setCommsDbFlag('error')
+  const postFamily = async () => {
+    await searchByName(newItem.familyName, async (gbifResponse) => {
+      await postNewItem('families', {
+        gbifKey: gbifResponse.usageKey,
+        scientificName: gbifResponse.scientificName
+      })
+      .then(() => {
+        setCommsDbFlag({
+          situation: 'info',
+          alertTitle: 'Nova família cadastrada no banco de dados.',
+          alertText: `Como a família ${newItem.familyName} não existia, ela foi cadastrada também.`
         })
       })
-    }
-    console.log('familyKey', familyKey)
-    await postNewItem('genera', {...newItem, familyKey: familyKey}, (flag) => {
-      setCommsDbFlag(flag)
+      .catch((err) => setCommsDbFlag({
+        situation: 'error',
+        alertTitle: 'Ocorreu um erro.',
+        alertText: err.message
+      }))
     })
   }
 
-  const isSpecie = async () => {
-    let familyKey = await checkFamily()
-    let genusKey = await checkGenus()
-
-    if(familyKey === null) {
-      await searchByName(newItem.familyName, async (gbifResponse) => {
-        await postNewItem('families', {
-          gbifKey: gbifResponse.usageKey,
-          scientificName: gbifResponse.scientificName
-        })
-        .then(async () => {
-          console.log('familia enviada')
-          familyKey = await checkFamily()
-        })
-        .catch((err) => {
-          console.log(err)
-          setCommsDbFlag('error')
+  const postGenus = async () => {
+    await searchByName(newItem.genusName, async (gbifResponse) => {
+      await postNewItem('genera', {
+        gbifKey: gbifResponse.usageKey,
+        scientificName: gbifResponse.scientificName,
+        familyKey: familyKey
+      })
+      .then(() => {
+        setCommsDbFlag({
+          situation: 'info',
+          alertTitle: 'Novo gênero cadastrado no banco de dados.',
+          alertText: `Como o gênero ${newItem.genusName} não existia, ele foi cadastrada também.`
         })
       })
+      .catch((err) => setCommsDbFlag({
+        situation: 'error',
+        alertTitle: 'Ocorreu um erro.',
+        alertText: err.message
+      }))
+    })
+  }
+  
+  
+  const isFamily = async () => {
+    await postNewItem('families', newItem)
+    .then(() => setCommsDbFlag({
+      situation: 'success',
+      alertTitle: 'Nova família cadastrada no banco de dados.'
+    }))
+    .catch((err) => setCommsDbFlag({
+      situation: 'error',
+      alertTitle: 'Ocorreu um erro.',
+      alertText: err.message
+    }))
+  } 
+
+  const isGenus = async () => {
+    // Checa a familia e manda pro banco se necessário
+    await checkFamily()
+    if(familyKey === null) {
+      await postFamily()
+    }
+    // Manda o genero pro banco
+    await postNewItem('genera', {...newItem, familyKey: familyKey})
+    .then(() => setCommsDbFlag({
+      situation: 'success',
+      alertTitle: 'Novo gênero cadastrado para o banco de dados.'
+    }))
+    .catch((err) => setCommsDbFlag({
+      situation: 'error',
+      alertTitle: 'Ocorreu um erro.',
+      alertText: err.message
+    }))
+  }
+
+  const isSpecie = async () => {
+    // Checa a familia e o gênero e manda pro banco se necessário
+    await checkFamily()
+    await checkGenus()
+    if(familyKey === null) {
+      await postFamily()
     }
     if(genusKey === null) {
-      await searchByName(newItem.genusName, async (gbifResponse) => {
-        await postNewItem('genera', {
-          gbifKey: gbifResponse.usageKey,
-          scientificName: gbifResponse.scientificName,
-          familyKey: familyKey
-        })
-        .then(async () => {
-          console.log('genero enviado')
-          genusKey = await checkGenus()
-          console.log('genusKey', genusKey)
-        })
-        .catch((err) => {
-          console.log(err)
-          setCommsDbFlag('error')
-        })
-      })
+      await postGenus()
     }
-    console.log('familyKey', familyKey)
-    console.log('genusKey', genusKey)
+    // Manda o genero pro banco
     await postNewItem('species', {...newItem, familyKey: familyKey, genusKey: genusKey})
-    .then(() => setCommsDbFlag('success'))
-    .catch((err) => {
-      console.log(err)
-      setCommsDbFlag('error')
-    })
+    .then(() => setCommsDbFlag({
+      situation: 'success',
+      alertTitle: 'Nova espécie cadastrada para o banco de dados.'
+    }))
+    .catch((err) => setCommsDbFlag({
+      situation: 'error',
+      alertTitle: 'Ocorreu um erro.',
+      alertText: err.message
+    }))
   }
 
   switch(newItem.rank) {
