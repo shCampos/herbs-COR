@@ -17,7 +17,7 @@ import {
   ThemeProvider,
   Tooltip,
   Typography } from '@material-ui/core'
-import { Add, Brightness7, ExpandMore, GitHub, Search, } from '@material-ui/icons'
+import { Add, Brightness7, ExpandMore, AccountCircle, GitHub, Search, } from '@material-ui/icons'
 import { Alert, AlertTitle, ToggleButton, ToggleButtonGroup, } from '@material-ui/lab';
 import { 
   getAllFamilies,
@@ -131,18 +131,25 @@ export default function App() {
     <ThemeProvider theme={themeConfig}>
     <CssBaseline/>
     <Backdrop className={classes.backdrop} open={backdropVisible}>
-      <Grid container direction="column" justify="center" alignItems="center">
+      <Grid container direction="column" justify="center" alignItems= "center">
         <CircularProgress color="inherit" />
         <Typography variant="h6">Carregando dados...</Typography>
       </Grid>
     </Backdrop>
-    <Grid container direction="row" justify="flex-start">
-      <IconButton variant="contained" onClick={toogleDarkMode} style={{width: 'min-content', height: 'min-content'}}>
-        <Brightness7/>
-      </IconButton>
-      <IconButton variant="contained" href="https://github.com/shCampos/farinaccio" target="_blank" style={{width: 'min-content', height: 'min-content'}}>
-        <GitHub/>
-      </IconButton>
+    <Grid container direction="row">
+      <Grid item xs={11}>
+        <IconButton variant="contained" onClick={toogleDarkMode} style={{width: 'min-content', height: 'min-content'}}>
+          <Brightness7/>
+        </IconButton>
+        <IconButton variant="contained" href="https://github.com/shCampos/farinaccio" target="_blank" style={{width: 'min-content', height: 'min-content'}}>
+          <GitHub/>
+        </IconButton>
+      </Grid>
+      <Grid item xs={1}>
+        <IconButton disabled variant="contained" style={{width: 'min-content', height: 'min-content', float: 'right'}}>
+          <AccountCircle/>
+        </IconButton>
+      </Grid>
     </Grid>
     <Grid container direction="column" justify="center" alignItems="center" className={classes.root}>
       <Typography variant="h2" className={classes.siteTitle}>
@@ -166,7 +173,7 @@ export default function App() {
               Sobre
             </Typography>
           </AccordionSummary>
-          <AccordionDetails fullWidth className={classes.acordionBody}>
+          <AccordionDetails className={classes.acordionBody}>
             <About />
           </AccordionDetails>
         </Accordion>
@@ -176,7 +183,7 @@ export default function App() {
               Ações rápidas
             </Typography>
           </AccordionSummary>
-          <AccordionDetails fullWidth className={classes.acordionBody}>
+          <AccordionDetails className={classes.acordionBody}>
             <Grid container direction="column">
               <Grid container direction="row" justify="flex-start" alignItems="center" spacing={1}>
                 <Grid item xs={2}>
@@ -219,9 +226,7 @@ export default function App() {
               {(speciesList.length > 0 && familiesList.length > 0 && queryResultList.length === 0)&&(
                 <Grid item>
                   {(postOrGetSwitch=='adicionar')?(
-                    <AddForm
-                      speciesList={speciesList}
-                    />
+                    <AddForm />
                   ):(
                     <SearchForm
                       queryType={queryType}
@@ -251,7 +256,7 @@ export default function App() {
               Dashboard completo
             </Typography>
           </AccordionSummary>
-          <AccordionDetails fullWidth className={classes.acordionBody}>
+          <AccordionDetails className={classes.acordionBody}>
             {(speciesList.length > 0 && familiesList.length > 0)&&(
               <Dashboard
                 speciesList={speciesList}

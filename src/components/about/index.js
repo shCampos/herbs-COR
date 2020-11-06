@@ -3,7 +3,6 @@ import {
   Avatar,
   Box,
   Divider,
-  Grid,
   List,
   ListItem,
   ListItemAvatar,

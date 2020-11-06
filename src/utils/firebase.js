@@ -19,67 +19,92 @@ export async function getAllFamilies(setFamilies) {
   })
 }
 
-export async function postNewFamily(family) {
-	await firebase.database().ref('plantae/families/').push(family)
-}
-
-export async function getFamilyByName(familyName, setCurrentFamily) {
-	await firebase.database().ref('plantae/families/')
-	.orderByChild('name')
-	.equalTo(familyName)
-	.on('value', (dataSnapshot) => {
-		setCurrentFamily(dataSnapshot.val())
-	})
-}
-
-export async function getFamilyByKey(familyKey, setCurrentFamily) {
+export async function getFamilyByKey(familyKey, returnFamily) {
 	await firebase.database().ref('plantae/families/')
 	.orderByKey()
 	.equalTo(familyKey)
 	.on('value', (dataSnapshot) => {
-		setCurrentFamily(dataSnapshot.val())
+		returnFamily(dataSnapshot.val())
 	})
 }
 
-export async function getGenreByFamilyKey(familyKey, setGenus) {
-	await firebase.database().ref('plantae/genres/')
+export async function getGenusByFamilyKey(familyKey, returnGenus) {
+	await firebase.database().ref('plantae/genera/')
 	.orderByChild('familyKey')
 	.equalTo(familyKey)
 	.on('value', (dataSnapshot) => {
-		setGenus(dataSnapshot.val())
+		returnGenus(dataSnapshot.val())
 	})
 }
 
-export async function getGenreByName(genreName, setCurrentGenre) {
-	await firebase.database().ref('plantae/genres/')
-	.orderByChild('name')
-	.equalTo(genreName)
-	.on('value', (dataSnapshot) => {
-		setCurrentGenre(dataSnapshot.val())
-	})
-}
-
-export async function postNewGenre(familyKey, newGenus) {
-	await firebase.database().ref('plantae/genres/')
-		.push({familyKey: familyKey, name: newGenus})
-}
-
-export async function getAllSpecies(setSpecies) {
+export async function getAllSpecies(returnSpecies) {
 	await firebase.database().ref('plantae/species/')
 	.on('value', (dataSnapshot) => {
-    setSpecies(dataSnapshot.val())
+    returnSpecies(dataSnapshot.val())
   })
 }
 
-export async function getSpeciesByGenre(genreKey) {
-
+export function getItemByKey(path, itemKey, returnItem) {
+	firebase.database().ref(`plantae/${path}/${itemKey}`)
+	.once('value', (dataSnapshot) => {
+		returnItem(dataSnapshot.val())
+	})
 }
 
-export async function postSpecieDescription(familyKey, genreKey, newSpecie) {
-	await firebase.database().ref('plantae/species/')
-	.push({
-		familyKey: familyKey,
-		genreKey: genreKey,
-		...newSpecie
+export function getItemByGBIFKey(path, gbifKey, returnItem) {
+	firebase.database().ref(`plantae/${path}`)
+	.orderByChild('gbifKey')
+	.equalTo(gbifKey)
+	.once('value', (dataSnapshot) => {
+		returnItem(dataSnapshot.val())
+	})
+}
+
+export function getItemByName(path, itemName, returnItem) {
+	firebase.database().ref(`plantae/${path}/`)
+	.orderByChild('scientificName')
+	.equalTo(itemName)
+	.on('value', (dataSnapshot) => {
+		returnItem(dataSnapshot.val())
+	})
+}
+
+export function getItemKeyByGBIFKey(path, gbifKey, returnItem) {
+	firebase.database().ref(`plantae/${path}/`)
+	.orderByChild('gbifKey')
+	.equalTo(gbifKey)
+	.on('value', (dataSnapshot) => {
+		let auxItemKey = [null]
+		if(dataSnapshot !== null && typeof dataSnapshot !== 'undefined') {
+			auxItemKey = Object.keys(dataSnapshot.val())
+		}
+		returnItem(auxItemKey[0])
+	})
+}
+
+export function postNewItem(path, itemDetails) {
+	itemDetails = {...itemDetails, descriptions: [{description: itemDetails.itemDescription, reference: itemDetails.itemReference}]}
+	delete itemDetails['itemDescription']
+	delete itemDetails['itemReference']
+	delete itemDetails['familyName']
+	delete itemDetails['genusName']
+	delete itemDetails['rank']
+
+	return firebase.database().ref(`plantae/${path}/`).push({...itemDetails})
+}
+
+export function postOtherDescription(path, itemKey, itemDescription/*, setCommsDbFlag*/) {
+	getItemByKey(path, itemKey, (itemDetails) => {
+		itemDetails.descriptions.push(itemDescription)
+		console.log(itemDetails)
+		firebase.database().ref(`plantae/${path}/${itemKey}`)
+		.set({
+			...itemDetails
+		})
+		// .then(() => console.log('deu certo')/*setCommsDbFlag('success')*/)
+		// .catch((err) => {
+		// 	console.log(err)
+		// 	/*setCommsDbFlag('error')*/
+		// })
 	})
 }
