@@ -75,7 +75,7 @@ export function getItemKeyByGBIFKey(path, gbifKey, returnItem) {
 	.equalTo(gbifKey)
 	.on('value', (dataSnapshot) => {
 		let auxItemKey = [null]
-		if(dataSnapshot !== null && typeof dataSnapshot !== 'undefined') {
+		if(dataSnapshot.val() !== null && typeof dataSnapshot.val() !== 'undefined') {
 			auxItemKey = Object.keys(dataSnapshot.val())
 		}
 		returnItem(auxItemKey[0])
@@ -83,12 +83,16 @@ export function getItemKeyByGBIFKey(path, gbifKey, returnItem) {
 }
 
 export function postNewItem(path, itemDetails) {
-	itemDetails = {...itemDetails, descriptions: [{description: itemDetails.itemDescription, reference: itemDetails.itemReference}]}
+	if(itemDetails.itemDescription && itemDetails.itemReference) {
+		itemDetails = {...itemDetails, descriptions: [{description: itemDetails.itemDescription, reference: itemDetails.itemReference}]}
+	}
 	delete itemDetails['itemDescription']
 	delete itemDetails['itemReference']
 	delete itemDetails['familyName']
 	delete itemDetails['genusName']
 	delete itemDetails['rank']
+	delete itemDetails['familyGBIFKey']
+	delete itemDetails['genusGBIFKey']
 
 	return firebase.database().ref(`plantae/${path}/`).push({...itemDetails})
 }

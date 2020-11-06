@@ -3,6 +3,7 @@ import {
   postNewItem,
   postOtherDescription,
 } from './firebase.js'
+import { searchByName } from './gbif.js'
 
 export function sendNewItemToDB(newItem, setCommsDbFlag) {
   console.log(newItem)
@@ -37,45 +38,69 @@ export function sendNewItemToDB(newItem, setCommsDbFlag) {
   } 
 
   const isGenus = async () => {
-    const familyKey = await checkFamily()
+    let familyKey = await checkFamily()
     if(familyKey === null) {
-      await postNewItem('families', {gbifKey: newItem.familyGBIFKey, scientificName: newItem.familyName})
-      .then(() => {
-        console.log('familia enviada')
-      })
-      .catch((err) => {
-        console.log(err)
-        setCommsDbFlag('error')
+      await searchByName(newItem.familyName, async (gbifResponse) => {
+        await postNewItem('families', {
+          gbifKey: gbifResponse.usageKey,
+          scientificName: gbifResponse.scientificName
+        })
+        .then(async () => {
+          console.log('familia enviada')
+          familyKey = await checkFamily()
+        })
+        .catch((err) => {
+          console.log(err)
+          setCommsDbFlag('error')
+        })
       })
     }
+    console.log('familyKey', familyKey)
     await postNewItem('genera', {...newItem, familyKey: familyKey}, (flag) => {
       setCommsDbFlag(flag)
     })
   }
 
   const isSpecie = async () => {
-    const familyKey = await checkFamily()
+    let familyKey = await checkFamily()
+    let genusKey = await checkGenus()
+
     if(familyKey === null) {
-      await postNewItem('families', {gbifKey: newItem.familyGBIFKey, scientificName: newItem.familyName})
-      .then(() => {
-        console.log('familia enviada')
-      })
-      .catch((err) => {
-        console.log(err)
-        setCommsDbFlag('error')
+      await searchByName(newItem.familyName, async (gbifResponse) => {
+        await postNewItem('families', {
+          gbifKey: gbifResponse.usageKey,
+          scientificName: gbifResponse.scientificName
+        })
+        .then(async () => {
+          console.log('familia enviada')
+          familyKey = await checkFamily()
+        })
+        .catch((err) => {
+          console.log(err)
+          setCommsDbFlag('error')
+        })
       })
     }
-    const genusKey = await checkGenus()
     if(genusKey === null) {
-      await postNewItem('genera', {gbifKey: newItem.genusGBIFKey, scientificName: newItem.genusName})
-      .then(() => {
-        console.log('genero enviado')
-      })
-      .catch((err) => {
-        console.log(err)
-        setCommsDbFlag('error')
+      await searchByName(newItem.genusName, async (gbifResponse) => {
+        await postNewItem('genera', {
+          gbifKey: gbifResponse.usageKey,
+          scientificName: gbifResponse.scientificName,
+          familyKey: familyKey
+        })
+        .then(async () => {
+          console.log('genero enviado')    
+          genusKey = await checkGenus()     
+        })
+        .catch((err) => {
+          console.log(err)
+          setCommsDbFlag('error')
+        })
       })
     }
+    console.log('familyKey', familyKey)
+    console.log('genusKey', genusKey)
+    console.log({...newItem, familyKey: familyKey, genusKey: genusKey})
     await postNewItem('species', {...newItem, familyKey: familyKey, genusKey: genusKey})
     .then(() => setCommsDbFlag('success'))
     .catch((err) => {
