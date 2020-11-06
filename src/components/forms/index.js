@@ -80,7 +80,7 @@ export function AddForm() {
       } else if (response.synonym) {
         setSearchFlags({...searchFlags, isSynonymous: true})
       } else {
-        setSearchFlags({...searchFlags, willSearch: false, nameSearched: true, isSynonymous: false})
+        setSearchFlags({...searchFlags, withoutAuthor: false, willSearch: false, nameSearched: true, isSynonymous: false})
         switch (response.rank) {
           case 'FAMILY':
             setNewItem({

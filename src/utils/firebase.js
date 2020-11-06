@@ -111,7 +111,7 @@ function sanitize(itemDetails) {
 	delete itemDetails['familyGBIFKey']
 	delete itemDetails['genusGBIFKey']
 	delete itemDetails['firebaseKey']
-	delete itemDetails['firebasePath']
+	delete itemDetails['databasePath']
 	delete itemDetails['alreadySearched']
 	
 	return itemDetails
