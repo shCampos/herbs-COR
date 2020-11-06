@@ -6,7 +6,7 @@ import {
 import { searchByName } from './gbif.js'
 
 export function sendNewItemToDB(newItem, setCommsDbFlag) {
-  console.log(newItem)
+  console.log('ta no metodo sendNewItemToDB')
 
   const checkFamily = async () => {
     let familyKey = null
@@ -89,8 +89,9 @@ export function sendNewItemToDB(newItem, setCommsDbFlag) {
           familyKey: familyKey
         })
         .then(async () => {
-          console.log('genero enviado')    
-          genusKey = await checkGenus()     
+          console.log('genero enviado')
+          genusKey = await checkGenus()
+          console.log('genusKey', genusKey)
         })
         .catch((err) => {
           console.log(err)
@@ -100,7 +101,6 @@ export function sendNewItemToDB(newItem, setCommsDbFlag) {
     }
     console.log('familyKey', familyKey)
     console.log('genusKey', genusKey)
-    console.log({...newItem, familyKey: familyKey, genusKey: genusKey})
     await postNewItem('species', {...newItem, familyKey: familyKey, genusKey: genusKey})
     .then(() => setCommsDbFlag('success'))
     .catch((err) => {
@@ -122,39 +122,6 @@ export function sendNewItemToDB(newItem, setCommsDbFlag) {
   }
 }
 
-export function sendNewDescriptionToDB(newItem, /*setCommsDbFlag*/) {
-  const isFamily = () => {
-    getItemKeyByGBIFKey('families', newItem.scientificName, (familyKey) => {
-      console.log('familyKey', familyKey)
-      postOtherDescription('families', familyKey, {
-        description: newItem.itemDescription, 
-        reference: newItem.itemReference
-      }/*, (flag) => {
-        setCommsDbFlag(flag)
-      }*/)
-    })
-  }
-
-  const isGenus = () => {
-    console.log('in construction')
-  }
-
-  const isSpecie = () => {
-    console.log('in construction')
-  }
-
-  switch(newItem.rank) {
-    case 'FAMILY':
-      isFamily()
-      break
-    case 'GENUS':
-      isGenus()
-      break
-    case 'SPECIES':
-      isSpecie()
-      break
-  }
-}
 /*
   ver se é genero, espécie ou família (DONE!)
   ver se já ta no db

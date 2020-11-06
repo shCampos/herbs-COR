@@ -97,18 +97,27 @@ export function postNewItem(path, itemDetails) {
 	return firebase.database().ref(`plantae/${path}/`).push({...itemDetails})
 }
 
-export function postOtherDescription(path, itemKey, itemDescription/*, setCommsDbFlag*/) {
+export function postOtherItemDescription(path, itemKey, itemDescription) {
 	getItemByKey(path, itemKey, (itemDetails) => {
 		itemDetails.descriptions.push(itemDescription)
-		console.log(itemDetails)
+		console.log('itemDetails', itemDetails)
+
+		delete itemDetails['itemDescription']
+		delete itemDetails['itemReference']
+		delete itemDetails['familyName']
+		delete itemDetails['genusName']
+		delete itemDetails['rank']
+		delete itemDetails['familyGBIFKey']
+		delete itemDetails['genusGBIFKey']
+		delete itemDetails['firebaseKey']
+
 		firebase.database().ref(`plantae/${path}/${itemKey}`)
 		.set({
 			...itemDetails
 		})
-		// .then(() => console.log('deu certo')/*setCommsDbFlag('success')*/)
-		// .catch((err) => {
-		// 	console.log(err)
-		// 	/*setCommsDbFlag('error')*/
-		// })
+		.then(() => console.log('deu certo'))
+		.catch((err) => {
+			console.log(err)
+		})
 	})
 }

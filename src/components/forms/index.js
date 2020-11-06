@@ -10,11 +10,10 @@ import {
 import { Alert, AlertTitle } from '@material-ui/lab'
 import { Search } from '@material-ui/icons'
 
-import { compareTwoStrings } from 'string-similarity'
 import { styleObject } from '../../assets/styleObject.js'
 import { searchByName } from '../../utils/gbif.js'
-import { getItemByName } from '../../utils/firebase.js'
-import { sendNewItemToDB, sendNewDescriptionToDB } from '../../utils/crossroads.js'
+import { getItemByName, postOtherItemDescription } from '../../utils/firebase.js'
+import { sendNewItemToDB } from '../../utils/crossroads.js'
 
 import ByDescriptionForm from './ByDescriptionForm.js'
 import ByNameForm from './ByNameForm.js'
@@ -58,12 +57,12 @@ export function AddForm() {
 
   const [newItem, setNewItem] = useState({})
   const handleAddFormChange = (event) => {
-    setSearchFlags({...searchFlags, withoutAuthor: false, specieInDb: false, isSynonymous: false})
+    setSearchFlags({...searchFlags, withoutAuthor: false, isSynonymous: false})
 
     const auxValues = { ...newItem }
     auxValues[event.target.name] = event.target.value
     setNewItem(auxValues)
-    
+
     if(!/(\w+\s){2}.{1,}/.test(auxValues.scientificName)) {
       setSearchFlags({...searchFlags, withoutAuthor: true})
     }
@@ -71,11 +70,11 @@ export function AddForm() {
 
   const searchName = () => {
     setSearchFlags({...searchFlags, willSearch: true})
-    searchInGBIF() 
+    searchInGBIF()
   }
 
   const searchInGBIF = () => {
-    searchByName(newItem.scientificName, (response) => {
+    searchByName(newItem.scientificName, async (response) => {
       if(response.usageKey === 6) {
         setSearchFlags({...searchFlags, specieNotFoundInGBIF: true})
       } else if (response.synonym) {
@@ -89,8 +88,8 @@ export function AddForm() {
               scientificName: response.scientificName,
               gbifKey: response.usageKey,
               rank: response.rank,
+              databasePath: 'families'
             })
-            searchInFirebase('families')
             break
           case 'GENUS':
             setNewItem({
@@ -100,8 +99,8 @@ export function AddForm() {
               rank: response.rank,
               familyName: response.family,
               familyGBIFKey: response.familyKey,
+              databasePath: 'genera'
             })
-            searchInFirebase('genera')
             break
           case 'SPECIES':
             setNewItem({
@@ -113,41 +112,56 @@ export function AddForm() {
               familyGBIFKey: response.familyKey,
               genusName: response.genus,
               genusGBIFKey: response.genusKey,
+              databasePath: 'species'
             })
-            searchInFirebase('species')
             break
         }
       }
     })      
   }
-  
-  const searchInFirebase = (rank) => {
-    getItemByName(rank, newItem.scientificName, (dataFromFirebase) => {
-      (dataFromFirebase === null)?setSearchFlags({...searchFlags, specieInDb: false, nameSearched: true}):setSearchFlags({...searchFlags, specieInDb: true, nameSearched: true})
-    })
-  }
 
-  
+  useEffect(() => {
+    (newItem.gbifKey && !newItem.alreadySearched)&&
+    getItemByName(newItem.databasePath, newItem.scientificName, (dataFromFirebase) => {
+      if(dataFromFirebase === null || dataFromFirebase === undefined) {
+        setSearchFlags({...searchFlags, specieInDb: false, nameSearched: true})
+        setNewItem({...newItem, alreadySearched: true})
+      } else {
+        const firebaseKey = Object.keys(dataFromFirebase)
+        setNewItem({...newItem, firebaseKey: firebaseKey[0], alreadySearched: true})
+        setSearchFlags({...searchFlags, specieInDb: true, nameSearched: true})
+      }
+    })
+  }, [newItem])
+
+  // const searchInFirebase = async () => {
+  //   await getItemByName(newItem.databasePath, newItem.scientificName, (dataFromFirebase) => {
+  //     console.log('dataFromFirebase'. dataFromFirebase)
+  //     if(dataFromFirebase === null || dataFromFirebase === undefined) {
+  //       console.log('entrou no IF')
+  //       setSearchFlags({...searchFlags, specieInDb: false, nameSearched: true})
+  //     } else {
+  //       console.log('entrou no else')
+  //       const firebaseKey = Object.keys(dataFromFirebase)
+  //       setNewItem({...newItem, firebaseKey: firebaseKey[0]})
+  //       setSearchFlags({...searchFlags, specieInDb: true, nameSearched: true})
+  //     }
+  //   })
+  // }
+
   const handleFormSubmit = callback => event => {
     event.preventDefault()
     callback()
   }
 
   const formAddSubmit = () => {
-    // if(searchFlags.specieInDb) {
-    //   sendNewDescriptionToDB(newItem/*, (flag) => {
-    //     console.log('sendNewDescriptionToDB chamada de novo')
-    //     setCommsDbFlag(flag)
-    //   }*/)
-    // } else {
-    //   sendNewItemToDB(newItem, (flag) => {
-    //     console.log('sendNewItemToDB chamada de novo')
-    //     setCommsDbFlag(flag)
-    //   })
-    // }
-    if(!searchFlags.specieInDb) {
+    if(searchFlags.specieInDb) {
+      postOtherItemDescription(newItem.databasePath, newItem.firebaseKey, {
+        description: newItem.itemDescription,
+        reference: newItem.itemReference
+      })
+    } else {
       sendNewItemToDB(newItem, (flag) => {
-        console.log('sendNewItemToDB chamada de novo')
         setCommsDbFlag(flag)
       })
     }
@@ -224,7 +238,7 @@ export function AddForm() {
         label="Referência (coloque nas normas da ABNT)" variant="outlined"
       />
       <Button type="submit" variant="contained" className={classes.btn} color="primary"
-        disabled={!searchFlags.nameSearched||searchFlags.specieNotFoundInGBIF||searchFlags.specieInDb}>
+        disabled={!searchFlags.nameSearched||searchFlags.specieNotFoundInGBIF}>
         Enviar
       </Button>
     </form>
