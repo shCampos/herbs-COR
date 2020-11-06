@@ -28,15 +28,6 @@ export async function getFamilyByKey(familyKey, returnFamily) {
 	})
 }
 
-export async function getGenusByFamilyKey(familyKey, returnGenus) {
-	await firebase.database().ref('plantae/genera/')
-	.orderByChild('familyKey')
-	.equalTo(familyKey)
-	.on('value', (dataSnapshot) => {
-		returnGenus(dataSnapshot.val())
-	})
-}
-
 export async function getAllSpecies(returnSpecies) {
 	await firebase.database().ref('plantae/species/')
 	.on('value', (dataSnapshot) => {
@@ -44,11 +35,9 @@ export async function getAllSpecies(returnSpecies) {
   })
 }
 
-export function getItemByKey(path, itemKey, returnItem) {
-	firebase.database().ref(`plantae/${path}/${itemKey}`)
-	.once('value', (dataSnapshot) => {
-		returnItem(dataSnapshot.val())
-	})
+export function getItemByKey(path, itemKey) {
+	return firebase.database().ref(`plantae/${path}/${itemKey}`)
+	.once('value', (dataSnapshot) => dataSnapshot.val())
 }
 
 export function getItemByGBIFKey(path, gbifKey, returnItem) {
@@ -91,14 +80,23 @@ export function postNewItem(path, itemDetails) {
 	return firebase.database().ref(`plantae/${path}/`).push({...itemDetails})
 }
 
-export function postOtherItemDescription(path, itemKey, itemDescription) {
-	getItemByKey(path, itemKey, (itemDetails) => {
-		itemDetails.descriptions.push(itemDescription)
-		sanitize(itemDetails)
-		return firebase.database().ref(`plantae/${path}/${itemKey}`)
-		.set({
-			...itemDetails
-		})		
+export async function postOtherItemDescription(path, itemKey, newDescription) {
+	let auxItemDetails = await getItemByKey(path, itemKey)
+	let itemDetails = auxItemDetails.val()
+	
+	if(itemDetails.descriptions) {
+		itemDetails.descriptions.push(newDescription)
+	} else {
+		itemDetails = {...itemDetails, descriptions: [{
+			description: newDescription.description,
+			reference: newDescription.reference
+		}]}
+	}
+	sanitize(itemDetails)
+
+	return firebase.database().ref(`plantae/${path}/${itemKey}`)
+	.set({
+		...itemDetails
 	})
 }
 
