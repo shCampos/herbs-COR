@@ -137,15 +137,3 @@ export function sendNewItemToDB(newItem, setCommsDbFlag) {
       break
   }
 }
-
-/*
-  ver se é genero, espécie ou família (DONE!)
-  ver se já ta no db
-  se não:
-    ver se a família já existe
-      se não:
-        buscar no GBIF e adicionar
-    ver se o gênero já existe
-      se não:
-        buscar no GBIF e adicionar
-*/

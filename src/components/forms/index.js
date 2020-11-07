@@ -47,11 +47,9 @@ export function AddForm() {
   useEffect(() => {
     if(commsDbFlag.situation == 'success') {
       setSearchFlags({firebaseFeedback: true})
-      setTimeout(() => setSearchFlags({firebaseFeedback: false}), 8000)
     }
     if(commsDbFlag.situation == 'error') {
       setSearchFlags({firebaseFeedback: true})
-      setTimeout(() => setSearchFlags({firebaseFeedback: false}), 8000)
     }
   }, [commsDbFlag])
 
@@ -176,7 +174,8 @@ export function AddForm() {
         )}
         {(searchFlags.specieInDb)&&(
           <Alert variant="outlined" style={{width: '100%'}} severity="info">
-            Essa espécie já foi inclusa no banco de dados.
+            <AlertTitle>Essa espécie já foi inclusa no banco de dados.</AlertTitle>
+            Novas descrições podem ser adicionadas.
           </Alert>
         )}
         {(searchFlags.willSearch)&&(
@@ -193,7 +192,7 @@ export function AddForm() {
         {(searchFlags.firebaseFeedback)&&(
           <Alert variant="outlined" style={{width: '100%'}} severity={commsDbFlag.situation}>
             <AlertTitle>{commsDbFlag.alertTitle}</AlertTitle>
-            {(commsDbFlag.alertText)&&(commsDbFlag.alertText)}
+            {commsDbFlag.alertText}
           </Alert>
         )}
       </Grid>
