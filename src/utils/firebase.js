@@ -20,12 +20,10 @@ export async function getAllFamilies(setFamilies) {
 }
 
 export function getFamilyByKey(familyKey, returnFamily) {
-	console.log('getFamilyByKey', familyKey, returnFamily)
 	firebase.database().ref('plantae/families/')
 	.orderByKey()
 	.equalTo(familyKey)
 	.on('value', (dataSnapshot) => {
-		console.log(dataSnapshot)
 		returnFamily(dataSnapshot.val())
 	})
 }

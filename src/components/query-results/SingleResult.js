@@ -20,12 +20,9 @@ export default function SingleResult(props) {
   const [specieFamily, setSpecieFamily] = useState({})
 
   useEffect(() => {
-    console.log(specie, specieFamily)
     getFamilyByKey(specie.familyKey, (dataFromFirebase) => {
-      console.log('dataFromFirebase', dataFromFirebase)
       const auxFamily = Object.entries(dataFromFirebase)
       setSpecieFamily(auxFamily[0][1])
-      console.log(auxFamily[0][1])
     })
   }, [])
   return (
