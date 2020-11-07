@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import MultipleResults from './MultipleResults'
 import SingleResult from './SingleResult'
 

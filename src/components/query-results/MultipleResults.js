@@ -1,17 +1,11 @@
 import React from 'react'
 import {
   Avatar,
-  Card,
-  CardActions,
-  CardContent,
-  CardHeader,
-  Collapse,
   Divider,
   List,
   ListItem,
   ListItemAvatar,
   ListItemText,
-  Typography,
 } from '@material-ui/core'
 import { styleObject } from '../../assets/styleObject.js'
 

@@ -19,11 +19,13 @@ export async function getAllFamilies(setFamilies) {
   })
 }
 
-export async function getFamilyByKey(familyKey, returnFamily) {
-	await firebase.database().ref('plantae/families/')
+export function getFamilyByKey(familyKey, returnFamily) {
+	console.log('getFamilyByKey', familyKey, returnFamily)
+	firebase.database().ref('plantae/families/')
 	.orderByKey()
 	.equalTo(familyKey)
 	.on('value', (dataSnapshot) => {
+		console.log(dataSnapshot)
 		returnFamily(dataSnapshot.val())
 	})
 }

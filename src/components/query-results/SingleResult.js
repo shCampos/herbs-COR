@@ -1,24 +1,30 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
-  Avatar,
   Card,
-  CardActions,
   CardContent,
   CardHeader,
   Collapse,
-  Divider,
   List,
   ListItem,
-  ListItemAvatar,
   ListItemText,
-  Typography,
 } from '@material-ui/core'
-
+import { ExpandLess, ExpandMore } from '@material-ui/icons'
+import { styleObject } from '../../assets/styleObject.js'
 import { getFamilyByKey } from '../../utils/firebase.js'
 
 export default function SingleResult(props) {
+  const classes = styleObject()
   const [specieFamily, setSpecieFamily] = useState({})
 
+  useEffect(() => {
+    console.log(props.specie, specieFamily)
+    getFamilyByKey(props.specie.familyKey, (dataFromFirebase) => {
+      console.log('dataFromFirebase', dataFromFirebase)
+      const auxFamily = Object.entries(dataFromFirebase)
+      setSpecieFamily(auxFamily[0][1])
+      console.log(auxFamily[0][1])
+    })
+  }, [])
   return (
     <Card variant="outlined" style={{width: '100%'}}>
       <CardHeader
@@ -29,16 +35,13 @@ export default function SingleResult(props) {
             {props.specie.scientificName.split(' ').slice(2).join(' ')}
           </span>
         }
-        subheader={() => {          
-          getFamilyByKey(props.specie.familyKey, (dataFromFirebase) => {
-            const auxFamily = Object.entries(dataFromFirebase)
-            setSpecieFamily(auxFamily[0][1])
-            console.log(auxFamily[0][1])
-          })
-          return(
-            <span>{specieFamily.name.toUpperCase()}</span>
-          )
-        }}
+        subheader={
+          <React.Fragment>
+            {(specieFamily.scientificName)&&(
+              <span>{specieFamily.scientificName.toUpperCase()}</span>
+            )}              
+          </React.Fragment>
+        }
       />
       <CardContent style={{width: '100%'}}>
         <List>
@@ -49,18 +52,8 @@ export default function SingleResult(props) {
               )
             })
           }
-        </List>
-        <Typography variant="body1" component="p" style={{textAlign: 'justify'}}>
-          {props.specie.descriptions[0].description}
-        </Typography>
-        
+        </List>        
       </CardContent>
-
-      <CardActions>
-        <Typography variant="caption" style={{textAlign: 'justify', fontWeight: 'bold'}}>
-          {props.specie.descriptions[0].reference}
-        </Typography>
-      </CardActions>
     </Card>
   )
 }
@@ -68,10 +61,15 @@ export default function SingleResult(props) {
 function DescriptionItem(props) {
   const [open, setOpen] = useState(false)
   
+  const handleClick = () => {
+    setOpen(!open)
+  }
+
   return (
     <React.Fragment>
-      <ListItem button onClick={setOpen(!open)}>
+      <ListItem button onClick={handleClick}>
         <ListItemText primary={props.d.reference}/>
+        {open ? <ExpandLess /> : <ExpandMore />}
       </ListItem>
       <Collapse in={open} timeout="auto" unmountOnExit>
         {props.d.description}
