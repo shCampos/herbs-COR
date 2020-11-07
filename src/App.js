@@ -19,18 +19,15 @@ import {
   Typography } from '@material-ui/core'
 import { Add, Brightness7, ExpandMore, AccountCircle, GitHub, Search, } from '@material-ui/icons'
 import { Alert, AlertTitle, ToggleButton, ToggleButtonGroup, } from '@material-ui/lab';
-import { 
-  getAllFamilies,
-  getAllSpecies,
-} from './utils/firebase.js'
 
 import { themeObject } from './assets/themeObject.js'
 import { styleObject } from './assets/styleObject.js'
+import { getAllFamilies, getAllSpecies } from './utils/firebase.js'
 
 import About from './components/about'
+import Dashboard from './components/dashboard'
 import { SearchForm, AddForm } from './components/forms'
 import QueryResults from './components/query-results'
-import Dashboard from './components/dashboard'
 
 const useDarkMode = () => {
   const [theme, setTheme] = useState(themeObject)
@@ -136,6 +133,7 @@ export default function App() {
         <Typography variant="h6">Carregando dados...</Typography>
       </Grid>
     </Backdrop>
+
     <Grid container direction="row">
       <Grid item xs={11}>
         <IconButton variant="contained" onClick={toogleDarkMode} style={{width: 'min-content', height: 'min-content'}}>
@@ -167,7 +165,7 @@ export default function App() {
       </Alert>
         
       <div style={{width: '684px'}}>
-        <Accordion expanded={expanded === 'panel1'} onChange={handlePanelChange('panel1')}>
+        <Accordion expanded={expanded === 'about'} onChange={handlePanelChange('about')}>
           <AccordionSummary expandIcon={<ExpandMore />} className={classes.acordionHeader}>
             <Typography className={classes.heading} variant="overline">
               Sobre
@@ -177,7 +175,7 @@ export default function App() {
             <About />
           </AccordionDetails>
         </Accordion>
-        <Accordion expanded={expanded === 'panel2'} onChange={handlePanelChange('panel2')}>
+        <Accordion expanded={expanded === 'actions'} onChange={handlePanelChange('actions')}>
           <AccordionSummary expandIcon={<ExpandMore />} className={classes.acordionHeader}>
             <Typography className={classes.heading} variant="overline">
               Ações rápidas
@@ -250,7 +248,7 @@ export default function App() {
             </Grid>
           </AccordionDetails>
         </Accordion>
-        <Accordion expanded={expanded === 'panel3'} onChange={handlePanelChange('panel3')}>
+        <Accordion expanded={expanded === 'dashboard'} onChange={handlePanelChange('dashboard')}>
           <AccordionSummary expandIcon={<ExpandMore />} className={classes.acordionHeader}>
             <Typography className={classes.heading} variant="overline">
               Dashboard completo

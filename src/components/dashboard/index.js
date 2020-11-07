@@ -57,7 +57,9 @@ export default function Dashboard(props) {
 							const family = props.familiesList.filter((family)=>family.key === specie.familyKey)
 							return (
 								<DataRow
-								specie={{...specie, familyName: family[0].scientificName}}/>
+									specie={{...specie, familyName: family[0].scientificName}}
+									setCurrentSpecie={props.setCurrentSpecie}
+								/>
 							)
 						})}
 					</TableBody>

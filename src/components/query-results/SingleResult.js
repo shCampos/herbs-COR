@@ -12,13 +12,16 @@ import { ExpandLess, ExpandMore } from '@material-ui/icons'
 import { styleObject } from '../../assets/styleObject.js'
 import { getFamilyByKey } from '../../utils/firebase.js'
 
+import DescriptionListItem from '../common/DescriptionListItem'
+
 export default function SingleResult(props) {
   const classes = styleObject()
+  const { specie } = props
   const [specieFamily, setSpecieFamily] = useState({})
 
   useEffect(() => {
-    console.log(props.specie, specieFamily)
-    getFamilyByKey(props.specie.familyKey, (dataFromFirebase) => {
+    console.log(specie, specieFamily)
+    getFamilyByKey(specie.familyKey, (dataFromFirebase) => {
       console.log('dataFromFirebase', dataFromFirebase)
       const auxFamily = Object.entries(dataFromFirebase)
       setSpecieFamily(auxFamily[0][1])
@@ -31,8 +34,8 @@ export default function SingleResult(props) {
         style={{paddingBottom: '0px'}}
         title={
           <span>
-            <i>{props.specie.scientificName.split(' ').slice(0,2).join(' ')} </i>
-            {props.specie.scientificName.split(' ').slice(2).join(' ')}
+            <i>{specie.scientificName.split(' ').slice(0,2).join(' ')} </i>
+            {specie.scientificName.split(' ').slice(2).join(' ')}
           </span>
         }
         subheader={
@@ -46,34 +49,14 @@ export default function SingleResult(props) {
       <CardContent style={{width: '100%'}}>
         <List>
           {
-            props.specie.descriptions.map((d) => {
+            specie.descriptions.map((d) => {
               return(
-                <DescriptionItem d={d}/>
+                <DescriptionListItem d={d}/>
               )
             })
           }
-        </List>        
+        </List>
       </CardContent>
     </Card>
-  )
-}
-
-function DescriptionItem(props) {
-  const [open, setOpen] = useState(false)
-  
-  const handleClick = () => {
-    setOpen(!open)
-  }
-
-  return (
-    <React.Fragment>
-      <ListItem button onClick={handleClick}>
-        <ListItemText primary={props.d.reference}/>
-        {open ? <ExpandLess /> : <ExpandMore />}
-      </ListItem>
-      <Collapse in={open} timeout="auto" unmountOnExit>
-        {props.d.description}
-      </Collapse>
-    </React.Fragment>
   )
 }
