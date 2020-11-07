@@ -107,5 +107,13 @@ export const styleObject = makeStyles((theme) => ({
   collapse: {
     paddingTop: '10px',
     paddingBottom: '10px'
+  },
+  filterCard: {
+    marginBottom: '20px',
+    backgroundColor: theme.palette.background.default,
+  },
+  filterIcon: {
+    fontSize: 40,
+    color: theme.palette.text.secondary
   }
 }))

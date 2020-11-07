@@ -57,7 +57,7 @@ export default function(props) {
       <Divider/>
 
       <Grid container justify="space-between" alignItems="center" style={{marginTop: '10px'}}>
-        <Grid item style={{float: 'left'}}>
+        <Grid item>
           <Typography variant="overline">
             <strong>Descrição Nº {index+1}</strong>
           </Typography>

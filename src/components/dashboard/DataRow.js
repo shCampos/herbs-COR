@@ -4,10 +4,8 @@ import {
 	IconButton,
 	Grid,
 	List,
-	Paper,
   TableCell,
 	TableRow,
-  Typography,
 } from '@material-ui/core'
 import { Delete, Description, Edit } from '@material-ui/icons'
 import { styleObject } from '../../assets/styleObject.js'
