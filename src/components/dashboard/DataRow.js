@@ -1,19 +1,22 @@
 import React, { useState } from 'react'
 import {
-  Box,
 	Collapse,
 	IconButton,
 	Grid,
 	List,
+	Paper,
   TableCell,
 	TableRow,
   Typography,
 } from '@material-ui/core'
 import { Delete, Description, Edit } from '@material-ui/icons'
+import { styleObject } from '../../assets/styleObject.js'
+
 import DescriptionListItem from '../common/DescriptionListItem'
 import EditItemForm from '../forms/EditItemForm'
 
 export default function DataRow(props) {
+	const classes = styleObject()
 	const { specie } = props
 	const [expanded, setExpanded] = useState({edit: false, view: false})
 
@@ -43,28 +46,24 @@ export default function DataRow(props) {
 
 			<TableRow>
 				<TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-					<Collapse in={expanded.view} timeout="auto" unmountOnExit>
-						<Box margin={1}>
-							<List>
-								{
-									props.specie.descriptions.map((d) => {
-										return(
-											<DescriptionListItem d={d}/>
-										)
-									})
-								}
-							</List>
-						</Box>
+					<Collapse in={expanded.view} timeout="auto" unmountOnExit className={classes.collapse}>
+						<List>
+							{
+								props.specie.descriptions.map((d) => {
+									return(
+										<DescriptionListItem d={d}/>
+									)
+								})
+							}
+						</List>
 					</Collapse>
 				</TableCell>
 			</TableRow>
 			
 			<TableRow>
 				<TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-					<Collapse in={expanded.edit} timeout="auto" unmountOnExit>
-						<Box margin={1}>
-							<EditItemForm specie={specie}/>
-						</Box>
+					<Collapse in={expanded.edit} timeout="auto" unmountOnExit className={classes.collapse}>
+						<EditItemForm specie={specie}/>
 					</Collapse>
 				</TableCell>
 			</TableRow>

@@ -53,14 +53,14 @@ export default function FilterRow(props) {
 					<TextField
 						fullWidth id="specieNameFilterParam" name="specieNameFilterParam"
 						onChange={handleSpecieNameChange} className={classes.input}
-						label="Filtrar pela espécie" size="small"
+						label="Filtrar pela espécie" size="small" autoComplete="off"
 					/>
 				</TableCell>
 				<TableCell>
-				<TextField
+					<TextField
 						fullWidth id="familyNameFilterParam" name="familyNameFilterParam"
 						onChange={handleFamilyNameChangeName} className={classes.input}
-						label="Filtrar pela família" size="small"
+						label="Filtrar pela família" size="small"autoComplete="off"
 					/>
 				</TableCell>
 				<TableCell></TableCell>

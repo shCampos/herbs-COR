@@ -97,5 +97,15 @@ export const styleObject = makeStyles((theme) => ({
   },
   listItem: {
     padding: 0
+  },
+  descriptionsArrow: {
+    color: theme.palette.text.secondary,
+    '&:hover': {
+      color: theme.palette.primary.main
+    },
+  },
+  collapse: {
+    paddingTop: '10px',
+    paddingBottom: '10px'
   }
 }))
