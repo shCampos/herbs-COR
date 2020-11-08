@@ -37,7 +37,8 @@ export default function DataRow(props) {
 						</Tooltip>
 						<Tooltip title="Editar">
 							<IconButton size="small" onClick={() => setExpanded({edit: !expanded.edit, view: false})} disabled>
-								<Edit style={{color: "#B85014"}}/>
+								{/* <Edit style={{color: "#B85014"}}/> */}
+								<Edit/>
 							</IconButton>
 						</Tooltip>
 						<Tooltip time="Excluir">
