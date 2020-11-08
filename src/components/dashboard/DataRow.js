@@ -6,6 +6,7 @@ import {
 	List,
   TableCell,
 	TableRow,
+	Tooltip,
 } from '@material-ui/core'
 import { Delete, Description, Edit } from '@material-ui/icons'
 import { styleObject } from '../../assets/styleObject.js'
@@ -28,16 +29,22 @@ export default function DataRow(props) {
 					{specie.familyName}
 				</TableCell> 
 				<TableCell component="th" scope="row">
-					<Grid container direction="row">            
-						<IconButton aria-label="descrição" size="small" onClick={() => setExpanded({edit: false, view: !expanded.view})}>
-							<Description style={{color: "#3975B8"}}/>
-						</IconButton>
-						<IconButton aria-label="editar" size="small" onClick={() => setExpanded({edit: !expanded.edit, view: false})}>
-							<Edit style={{color: "#B85014"}}/>
-						</IconButton>
-						<IconButton aria-label="excluir" size="small" disabled>
-							<Delete color="error"/>
-						</IconButton>
+					<Grid container direction="row" justify="center" alignItems="center">
+						<Tooltip title="Mostrar a descrição">
+							<IconButton size="small" onClick={() => setExpanded({edit: false, view: !expanded.view})}>
+								<Description style={{color: "#3975B8"}}/>
+							</IconButton>
+						</Tooltip>
+						<Tooltip title="Editar">
+							<IconButton size="small" onClick={() => setExpanded({edit: !expanded.edit, view: false})}>
+								<Edit style={{color: "#B85014"}}/>
+							</IconButton>
+						</Tooltip>
+						<Tooltip time="Excluir">
+							<IconButton size="small" disabled>
+								<Delete/>
+							</IconButton>
+						</Tooltip>
 					</Grid>
 				</TableCell>
 			</TableRow>
