@@ -1,9 +1,6 @@
-import React, { useState } from 'react'
-import {
-  Snackbar
-} from '@material-ui/core'
+import React from 'react'
+import { Snackbar } from '@material-ui/core'
 import { Alert, AlertTitle } from '@material-ui/lab'
-
 
 export default function SnackAlert(props) {
   const { flag } = props

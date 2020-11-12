@@ -4,14 +4,13 @@ import {
   Divider,
   IconButton,
   Grid,
-  Snackbar,
   TextField,
   Typography,
 } from '@material-ui/core'
-import { Alert, AlertTitle } from '@material-ui/lab'
 import { ArrowBackIos, ArrowForwardIos } from '@material-ui/icons'
-import { getItemByName, setItemDetails } from '../../utils/firebase.js'
+import SnackAlert from '../common/SnackAlert'
 
+import { getItemByName, setItemDetails } from '../../utils/firebase.js'
 import { styleObject } from '../../assets/styleObject.js'
 
 export default function(props) {
@@ -68,12 +67,7 @@ export default function(props) {
 
   return (
     <form onSubmit={handleFormSubmit(saveChanges)} autoComplete="off">
-      <Snackbar open={flag.open} autoHideDuration={1000}>
-        <Alert severity={flag.severity}>
-          <AlertTitle>{flag.alertTitle}</AlertTitle>
-          {flag.alertText}
-        </Alert>
-      </Snackbar>
+      <SnackAlert flag={flag}/>
 
       <TextField
         required id="scientificName" name="scientificName"
