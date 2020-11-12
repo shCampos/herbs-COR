@@ -40,7 +40,6 @@ export default function(props) {
 
     delete auxValues['itemDescription']
     delete auxValues['itemReference']
-    console.log(auxValues)
     setAuxSpecie(auxValues)
   }
   
@@ -58,13 +57,12 @@ export default function(props) {
   }
 
   const saveChanges = () => {
-    console.log('salvou ')
     getItemByName('species', auxSpecie.scientificName, (dataFromFirebase) => {
       const firebaseKey = Object.keys(dataFromFirebase)
 
       setItemDetails('species', firebaseKey[0], auxSpecie)
       .then(() => setFlag({open: true, severity: 'success', alertTitle: 'Dados modificados com sucesso!'}))
-      .catch((err) => setFlag({open: true, severity: 'error', alertTitle: 'Dados modificados com sucesso!', alertText: err.message}))
+      .catch((err) => setFlag({open: true, severity: 'error', alertTitle: 'Ocorreu um erro.', alertText: err.message}))
     })
   }
 
@@ -79,7 +77,7 @@ export default function(props) {
 
       <TextField
         required id="scientificName" name="scientificName"
-        defaultValue={auxSpecie.scientificName}
+        defaultValue={auxSpecie.scientificName} value={auxSpecie.scientificName}
         onChange={handleEditFormChange}
         className={classes.input} variant="outlined"
         label="Nome científico"

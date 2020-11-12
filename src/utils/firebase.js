@@ -107,6 +107,11 @@ export async function postOtherItemDescription(path, itemKey, newDescription) {
 	})
 }
 
+export function deleteItem(path, itemKey) {
+	return firebase.database().ref(`plantae/${path}/${itemKey}/`)
+	.remove()
+}
+
 function sanitize(itemDetails) {
 	delete itemDetails['itemDescription']
 	delete itemDetails['itemReference']
