@@ -80,6 +80,13 @@ export function postNewItem(path, itemDetails) {
 	return firebase.database().ref(`plantae/${path}/`).push({...itemDetails})
 }
 
+export function setItemDetails(path, itemKey, itemDetails) {
+	sanitize(itemDetails)
+
+	return firebase.database().ref(`plantae/${path}/${itemKey}`)
+	.set({...itemDetails})
+}
+
 export async function postOtherItemDescription(path, itemKey, newDescription) {
 	let auxItemDetails = await getItemByKey(path, itemKey)
 	let itemDetails = auxItemDetails.val()
@@ -111,6 +118,7 @@ function sanitize(itemDetails) {
 	delete itemDetails['firebaseKey']
 	delete itemDetails['databasePath']
 	delete itemDetails['alreadySearched']
-	
+	delete itemDetails['specieKey']
+
 	return itemDetails
 }

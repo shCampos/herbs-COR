@@ -36,9 +36,8 @@ export default function DataRow(props) {
 							</IconButton>
 						</Tooltip>
 						<Tooltip title="Editar">
-							<IconButton size="small" onClick={() => setExpanded({edit: !expanded.edit, view: false})} disabled>
-								{/* <Edit style={{color: "#B85014"}}/> */}
-								<Edit/>
+							<IconButton size="small" onClick={() => setExpanded({edit: !expanded.edit, view: false})}>
+								<Edit style={{color: "#B85014"}}/>
 							</IconButton>
 						</Tooltip>
 						<Tooltip time="Excluir">
@@ -55,7 +54,7 @@ export default function DataRow(props) {
 					<Collapse in={expanded.view} timeout="auto" unmountOnExit className={classes.collapse}>
 						<List>
 							{
-								props.specie.descriptions.map((d) => {
+								specie.descriptions.map((d) => {
 									return(
 										<DescriptionListItem d={d}/>
 									)

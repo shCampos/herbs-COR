@@ -105,6 +105,7 @@ export default function App() {
         setSpeciesList([])
       } else {
         const auxSpeciesList = Object.entries(speciesFromDb).map((specie) => typeof specie[1].scientificName !== 'undefined'&&specie[1])
+
         const withFirstLetterSpeciesList = auxSpeciesList.map((specie) => {
           return {
             ...specie,

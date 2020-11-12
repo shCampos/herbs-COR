@@ -45,10 +45,10 @@ export function AddForm() {
 
   const [commsDbFlag, setCommsDbFlag] = useState({})
   useEffect(() => {
-    if(commsDbFlag.situation == 'success') {
+    if(commsDbFlag.severity == 'success') {
       setSearchFlags({firebaseFeedback: true})
     }
-    if(commsDbFlag.situation == 'error') {
+    if(commsDbFlag.severity == 'error') {
       setSearchFlags({firebaseFeedback: true})
     }
   }, [commsDbFlag])
@@ -144,11 +144,11 @@ export function AddForm() {
         reference: newItem.itemReference
       })
       .then(() => setCommsDbFlag({
-        situation: 'success',
+        severity: 'success',
         alertTitle: 'Descrição enviada para o banco de dados.'
       }))
       .catch((err) => setCommsDbFlag({
-        situation: 'error',
+        severity: 'error',
         alertTitle: 'Ocorreu um erro.',
         alertText: err.message
       }))
@@ -190,7 +190,7 @@ export function AddForm() {
           </Alert>
         )}
         {(searchFlags.firebaseFeedback)&&(
-          <Alert variant="outlined" style={{width: '100%'}} severity={commsDbFlag.situation}>
+          <Alert variant="outlined" style={{width: '100%'}} severity={commsDbFlag.severity}>
             <AlertTitle>{commsDbFlag.alertTitle}</AlertTitle>
             {commsDbFlag.alertText}
           </Alert>

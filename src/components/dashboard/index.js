@@ -29,7 +29,7 @@ export default function Dashboard(props) {
 	const { speciesList, familiesList } = props
 	const classes = styleObject()
 
-	const [currentSpeciesList, setCurrentSpeciesList] = useState(props.speciesList)
+	const [currentSpeciesList, setCurrentSpeciesList] = useState(speciesList)
   const [currentSpeciesListIsEmpty, setCurrentSpeciesListIsEmpty] = useState(false)
 
   return (

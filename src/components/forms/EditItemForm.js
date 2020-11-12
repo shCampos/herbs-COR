@@ -1,19 +1,17 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
-  Box,
   Button,
-  ButtonGroup,
-  Card,
-  CardActions,
-  CardContent,
-  Container,
   Divider,
   IconButton,
   Grid,
+  Snackbar,
   TextField,
   Typography,
 } from '@material-ui/core'
+import { Alert, AlertTitle } from '@material-ui/lab'
 import { ArrowBackIos, ArrowForwardIos } from '@material-ui/icons'
+import { getItemByName, setItemDetails } from '../../utils/firebase.js'
+
 import { styleObject } from '../../assets/styleObject.js'
 
 export default function(props) {
@@ -22,12 +20,30 @@ export default function(props) {
   const [auxSpecie, setAuxSpecie] = useState(specie)
   const [index, setIndex] = useState(0)
 
-  const handleAddFormChange = (event) => {
+  const [flag, setFlag] = useState({})
+
+  const handleEditFormChange = (event) => {
     const auxValues = { ...auxSpecie }
     auxValues[event.target.name] = event.target.value
+
+    if(auxValues.auxDescription && !auxValues.auxReference) {
+      auxValues.descriptions[index] = {
+        description: auxValues.auxDescription,
+        reference: auxValues.descriptions[index].reference
+      }
+    } else if(!auxValues.auxDescription && auxValues.auxReference) {
+      auxValues.descriptions[index] = {
+        description: auxValues.descriptions[index].description,
+        reference: auxValues.auxReference
+      }
+    }
+
+    delete auxValues['itemDescription']
+    delete auxValues['itemReference']
+    console.log(auxValues)
     setAuxSpecie(auxValues)
   }
-
+  
   const handleArrowBack = () => {
     setIndex(index-1)
   }
@@ -42,14 +58,29 @@ export default function(props) {
   }
 
   const saveChanges = () => {
-    console.log('works')
+    console.log('salvou ')
+    getItemByName('species', auxSpecie.scientificName, (dataFromFirebase) => {
+      const firebaseKey = Object.keys(dataFromFirebase)
+
+      setItemDetails('species', firebaseKey[0], auxSpecie)
+      .then(() => setFlag({open: true, severity: 'success', alertTitle: 'Dados modificados com sucesso!'}))
+      .catch((err) => setFlag({open: true, severity: 'error', alertTitle: 'Dados modificados com sucesso!', alertText: err.message}))
+    })
   }
 
   return (
     <form onSubmit={handleFormSubmit(saveChanges)} autoComplete="off">
+      <Snackbar open={flag.open} autoHideDuration={1000}>
+        <Alert severity={flag.severity}>
+          <AlertTitle>{flag.alertTitle}</AlertTitle>
+          {flag.alertText}
+        </Alert>
+      </Snackbar>
+
       <TextField
         required id="scientificName" name="scientificName"
-        onChange={handleAddFormChange} value={auxSpecie.scientificName}
+        defaultValue={auxSpecie.scientificName}
+        onChange={handleEditFormChange}
         className={classes.input} variant="outlined"
         label="Nome científico"
       />
@@ -80,15 +111,17 @@ export default function(props) {
 
       <TextField
         fullWidth required multiline rows={10}
-        id="itemDescription" name="itemDescription" value={auxSpecie.descriptions[index].description}
-        onChange={handleAddFormChange} className={classes.input}
+        id="auxDescription" name="auxDescription" defaultValue={auxSpecie.descriptions[index].description}
+        value={auxSpecie.descriptions[index].description}
+        className={classes.input} onChange={handleEditFormChange}
         label="Descrição" variant="outlined"
       />
 
       <TextField
         fullWidth required multiline rows={3}
-        id="itemReference" name="itemReference" value={auxSpecie.descriptions[index].reference}
-        onChange={handleAddFormChange} className={classes.input}
+        id="auxReference" name="auxReference" defaultValue={auxSpecie.descriptions[index].reference}
+        value={auxSpecie.descriptions[index].reference}
+        className={classes.input} onChange={handleEditFormChange}
         label="Referência (coloque nas normas da ABNT)" variant="outlined"
       />
 

@@ -34,13 +34,13 @@ export function sendNewItemToDB(newItem, setCommsDbFlag) {
       })
       .then(() => {
         setCommsDbFlag({
-          situation: 'info',
+          severity: 'info',
           alertTitle: 'Nova família cadastrada no banco de dados.',
           alertText: `Como a família ${newItem.familyName} não existia, ela foi cadastrada também.`
         })
       })
       .catch((err) => setCommsDbFlag({
-        situation: 'error',
+        severity: 'error',
         alertTitle: 'Ocorreu um erro.',
         alertText: err.message
       }))
@@ -56,13 +56,13 @@ export function sendNewItemToDB(newItem, setCommsDbFlag) {
       })
       .then(() => {
         setCommsDbFlag({
-          situation: 'info',
+          severity: 'info',
           alertTitle: 'Novo gênero cadastrado no banco de dados.',
           alertText: `Como o gênero ${newItem.genusName} não existia, ele foi cadastrada também.`
         })
       })
       .catch((err) => setCommsDbFlag({
-        situation: 'error',
+        severity: 'error',
         alertTitle: 'Ocorreu um erro.',
         alertText: err.message
       }))
@@ -73,11 +73,11 @@ export function sendNewItemToDB(newItem, setCommsDbFlag) {
   const isFamily = async () => {
     await postNewItem('families', newItem)
     .then(() => setCommsDbFlag({
-      situation: 'success',
+      severity: 'success',
       alertTitle: 'Nova família cadastrada no banco de dados.'
     }))
     .catch((err) => setCommsDbFlag({
-      situation: 'error',
+      severity: 'error',
       alertTitle: 'Ocorreu um erro.',
       alertText: err.message
     }))
@@ -92,11 +92,11 @@ export function sendNewItemToDB(newItem, setCommsDbFlag) {
     // Manda o genero pro banco
     await postNewItem('genera', {...newItem, familyKey: familyKey})
     .then(() => setCommsDbFlag({
-      situation: 'success',
+      severity: 'success',
       alertTitle: 'Novo gênero cadastrado para o banco de dados.'
     }))
     .catch((err) => setCommsDbFlag({
-      situation: 'error',
+      severity: 'error',
       alertTitle: 'Ocorreu um erro.',
       alertText: err.message
     }))
@@ -115,11 +115,11 @@ export function sendNewItemToDB(newItem, setCommsDbFlag) {
     // Manda o genero pro banco
     await postNewItem('species', {...newItem, familyKey: familyKey, genusKey: genusKey})
     .then(() => setCommsDbFlag({
-      situation: 'success',
+      severity: 'success',
       alertTitle: 'Nova espécie cadastrada para o banco de dados.'
     }))
     .catch((err) => setCommsDbFlag({
-      situation: 'error',
+      severity: 'error',
       alertTitle: 'Ocorreu um erro.',
       alertText: err.message
     }))
