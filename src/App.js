@@ -157,13 +157,6 @@ export default function App() {
       <Typography variant="h6" className={classes.siteDescription}>
         apenas um site para ajudar na identificação de espécies das Iniciações Científicas do Herbário-COR
       </Typography>
-
-      <Alert variant="outlined" severity="warning" style={{marginBottom: '10px'}}>
-        <AlertTitle><strong>O site está em processo de atualização!</strong></AlertTitle>
-        Calma, a gente sabe que o site tá feio e que várias coisas não funcionam, <br/>
-        mas relaxa que quando os professores pararem de passar tarefa, o programador <br/>
-        vai deixar tudo funcionando ;)
-      </Alert>
         
       <div style={{width: '684px'}}>
         <Accordion expanded={expanded === 'about'} onChange={handlePanelChange('about')}>
