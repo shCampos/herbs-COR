@@ -1,4 +1,4 @@
-# Farinaccio
+# Herbs COR
 Apenas um site para ajudar na identificação de espécies das Iniciações Científicas do Herbário-COR.
 
 ## Como usar
