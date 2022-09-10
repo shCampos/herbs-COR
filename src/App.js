@@ -152,7 +152,7 @@ export default function App() {
     </Grid>
     <Grid container direction="column" justify="center" alignItems="center" className={classes.root}>
       <Typography variant="h2" className={classes.siteTitle}>
-        Herbs COR
+        Herbs <b>COR</b>
       </Typography>
       <Typography variant="h6" className={classes.siteDescription}>
         apenas um site para ajudar na identificação de espécies das Iniciações Científicas do Herbário-COR
